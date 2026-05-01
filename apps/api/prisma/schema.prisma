@@ -8,63 +8,283 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum GoalStatus {
+  DRAFT
+  NOT_STARTED
+  IN_PROGRESS
+  BLOCKED
+  COMPLETED
+  ARCHIVED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum NotificationType {
+  GOAL_ASSIGNED
+  MILESTONE_UPDATED
+  ANNOUNCEMENT_POSTED
+  COMMENT_MENTION
+  ACTION_ITEM_DUE
+  ACTION_ITEM_ASSIGNED
+  REACTION_RECEIVED
+  WORKSPACE_INVITE
+}
+
+enum ReactionType {
+  LIKE
+  CELEBRATE
+  SUPPORT
+  INSIGHTFUL
+}
+
+enum ActionItemStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
+
+enum AuditAction {
+  USER_REGISTERED
+  USER_LOGGED_IN
+  USER_LOGGED_OUT
+  TOKEN_REFRESHED
+  WORKSPACE_CREATED
+  MEMBER_ADDED
+  GOAL_CREATED
+  GOAL_UPDATED
+  ANNOUNCEMENT_CREATED
+  ACTION_ITEM_CREATED
+}
+
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
-  passwordHash String
-  name         String
-  avatarUrl    String?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  memberships  Membership[]
-  tasks        Task[]      @relation("TaskAssignee")
+  id                      String            @id @default(cuid())
+  email                   String            @unique
+  passwordHash            String
+  name                    String
+  avatarUrl               String?
+  currentRefreshTokenHash String?
+  refreshTokenExpiresAt   DateTime?
+  createdAt               DateTime          @default(now())
+  updatedAt               DateTime          @updatedAt
+  ownedWorkspaces         Workspace[]       @relation("WorkspaceOwner")
+  workspaceMemberships    WorkspaceMember[]
+  createdGoals            Goal[]            @relation("GoalCreator")
+  ownedMilestones         Milestone[]       @relation("MilestoneOwner")
+  authoredAnnouncements   Announcement[]
+  authoredComments        Comment[]
+  reactions               Reaction[]
+  assignedActionItems     ActionItem[]      @relation("ActionItemAssignee")
+  createdActionItems      ActionItem[]      @relation("ActionItemCreator")
+  notifications           Notification[]
+  auditLogs               AuditLog[]
 }
 
 model Workspace {
-  id          String       @id @default(cuid())
-  name        String
-  slug        String       @unique
-  description String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  memberships Membership[]
-  projects    Project[]
+  id            String            @id @default(cuid())
+  name          String
+  slug          String            @unique
+  description   String?
+  ownerId       String
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  owner         User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members       WorkspaceMember[]
+  goals         Goal[]
+  announcements Announcement[]
+  actionItems   ActionItem[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  comments      Comment[]
+  reactions     Reaction[]
 }
 
-model Membership {
-  id          String    @id @default(cuid())
-  role        String    @default("member")
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  role        WorkspaceRole @default(MEMBER)
   userId      String
   workspaceId String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  joinedAt    DateTime      @default(now())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+  @@index([workspaceId, role])
 }
 
-model Project {
-  id          String    @id @default(cuid())
-  name        String
-  description String?
+model Goal {
+  id          String      @id @default(cuid())
   workspaceId String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  tasks       Task[]
-}
-
-model Task {
-  id          String    @id @default(cuid())
+  createdById String
   title       String
   description String?
-  status      String    @default("todo")
-  projectId   String
-  assigneeId  String?
+  status      GoalStatus  @default(NOT_STARTED)
+  priority    Priority    @default(MEDIUM)
+  startDate   DateTime?
   dueDate     DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  assignee    User?     @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
-  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  completedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User        @relation("GoalCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  milestones  Milestone[]
+  comments    Comment[]
+  reactions   Reaction[]
+  actionItems ActionItem[]
+
+  @@index([workspaceId, status])
+  @@index([workspaceId, priority])
+}
+
+model Milestone {
+  id          String      @id @default(cuid())
+  goalId       String
+  ownerId      String?
+  title        String
+  description  String?
+  status       GoalStatus @default(NOT_STARTED)
+  priority     Priority   @default(MEDIUM)
+  dueDate      DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  goal         Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  owner        User?      @relation("MilestoneOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  comments     Comment[]
+  reactions    Reaction[]
+  actionItems  ActionItem[]
+
+  @@index([goalId, status])
+}
+
+model Announcement {
+  id          String      @id @default(cuid())
+  workspaceId String
+  authorId    String
+  title       String
+  body        String
+  pinned      Boolean     @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  reactions   Reaction[]
+
+  @@index([workspaceId, publishedAt])
+}
+
+model Comment {
+  id             String         @id @default(cuid())
+  workspaceId     String
+  authorId        String
+  body            String
+  goalId          String?
+  milestoneId     String?
+  announcementId  String?
+  parentCommentId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  workspace       Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  goal            Goal?         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  milestone       Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  announcement    Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  parentComment   Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies         Comment[]     @relation("CommentReplies")
+  reactions       Reaction[]
+
+  @@index([workspaceId, createdAt])
+}
+
+model Reaction {
+  id             String         @id @default(cuid())
+  workspaceId     String
+  userId          String
+  type            ReactionType  @default(LIKE)
+  goalId          String?
+  milestoneId     String?
+  announcementId  String?
+  commentId       String?
+  createdAt       DateTime      @default(now())
+  workspace       Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal            Goal?         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  milestone       Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  announcement    Announcement? @relation(fields: [announcementId], references: [id], onDelete: Cascade)
+  comment         Comment?      @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId, type])
+  @@index([userId, createdAt])
+}
+
+model ActionItem {
+  id          String           @id @default(cuid())
+  workspaceId String
+  createdById String
+  assigneeId  String?
+  goalId      String?
+  milestoneId String?
+  title       String
+  description String?
+  status      ActionItemStatus @default(OPEN)
+  priority    Priority         @default(MEDIUM)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  workspace   Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy   User             @relation("ActionItemCreator", fields: [createdById], references: [id], onDelete: Cascade)
+  assignee    User?            @relation("ActionItemAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  goal        Goal?            @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  milestone   Milestone?       @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, status])
+  @@index([assigneeId, dueDate])
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  workspaceId String?
+  type        NotificationType
+  title       String
+  message     String
+  entityId    String?
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace?       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+model AuditLog {
+  id         String      @id @default(cuid())
+  workspaceId String?
+  actorId     String?
+  action      AuditAction
+  entityType  String
+  entityId    String?
+  metadata    Json?
+  createdAt   DateTime    @default(now())
+  workspace   Workspace?  @relation(fields: [workspaceId], references: [id], onDelete: SetNull)
+  actor       User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId, createdAt])
+  @@index([actorId, createdAt])
 }
