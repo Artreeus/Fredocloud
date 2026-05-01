@@ -25,6 +25,7 @@ export const useWorkspaceStore = create((set, get) => ({
   workspaces: [],
   activeWorkspaceId: null,
   activeWorkspace: null,
+  rolePermissions: [],
   members: [],
   invitations: [],
   pendingInvitations: [],
@@ -37,6 +38,7 @@ export const useWorkspaceStore = create((set, get) => ({
       workspaces: [],
       activeWorkspaceId: null,
       activeWorkspace: null,
+      rolePermissions: [],
       members: [],
       invitations: [],
       pendingInvitations: [],
@@ -56,7 +58,10 @@ export const useWorkspaceStore = create((set, get) => ({
       activeWorkspace: nextActiveWorkspace
     });
 
-    await get().fetchMembers(nextActiveWorkspace.id, { silent: true });
+    await Promise.all([
+      get().fetchMembers(nextActiveWorkspace.id, { silent: true }),
+      get().fetchPermissions(nextActiveWorkspace.id, { silent: true })
+    ]);
   },
   fetchWorkspaces: async ({ silent = false } = {}) => {
     if (!silent) {
@@ -75,9 +80,12 @@ export const useWorkspaceStore = create((set, get) => ({
       });
 
       if (nextState.activeWorkspaceId) {
-        await get().fetchMembers(nextState.activeWorkspaceId, { silent: true });
+        await Promise.all([
+          get().fetchMembers(nextState.activeWorkspaceId, { silent: true }),
+          get().fetchPermissions(nextState.activeWorkspaceId, { silent: true })
+        ]);
       } else {
-        set({ members: [], invitations: [] });
+        set({ members: [], invitations: [], rolePermissions: [] });
       }
 
       return payload.workspaces;
@@ -111,6 +119,32 @@ export const useWorkspaceStore = create((set, get) => ({
         error: null
       });
       return payload.members;
+    } catch (error) {
+      set({ error: silent ? null : error.message });
+      throw error;
+    } finally {
+      if (!silent) {
+        set({ loading: false });
+      }
+    }
+  },
+  fetchPermissions: async (workspaceId = get().activeWorkspaceId, { silent = false } = {}) => {
+    if (!workspaceId) {
+      set({ rolePermissions: [] });
+      return [];
+    }
+
+    if (!silent) {
+      set({ loading: true, error: null });
+    }
+
+    try {
+      const payload = await apiRequest(`/api/workspaces/${workspaceId}/permissions`);
+      set({
+        rolePermissions: payload.permissions,
+        error: null
+      });
+      return payload.permissions;
     } catch (error) {
       set({ error: silent ? null : error.message });
       throw error;
@@ -167,6 +201,7 @@ export const useWorkspaceStore = create((set, get) => ({
 
       await Promise.all([
         get().fetchMembers(payload.workspace.id, { silent: true }),
+        get().fetchPermissions(payload.workspace.id, { silent: true }),
         useAuthStore.getState().fetchMe({ silent: true }).catch(() => {})
       ]);
 
@@ -199,6 +234,7 @@ export const useWorkspaceStore = create((set, get) => ({
       });
 
       await useAuthStore.getState().fetchMe({ silent: true }).catch(() => {});
+      await get().fetchPermissions(workspaceId, { silent: true });
 
       return payload.workspace;
     } catch (error) {
@@ -272,6 +308,30 @@ export const useWorkspaceStore = create((set, get) => ({
         useAuthStore.getState().fetchMe({ silent: true }).catch(() => {})
       ]);
       return payload.workspace;
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  updateRolePermissions: async (workspaceId, role, permissions) => {
+    set({ loading: true, error: null });
+
+    try {
+      const payload = await apiRequest(`/api/workspaces/${workspaceId}/permissions/${role}`, {
+        method: "PATCH",
+        body: JSON.stringify({ permissions })
+      });
+
+      set({
+        rolePermissions: payload.permissions,
+        error: null
+      });
+
+      await useAuthStore.getState().fetchMe({ silent: true }).catch(() => {});
+      await get().fetchWorkspaces({ silent: true });
+      return payload.permissions;
     } catch (error) {
       set({ error: error.message });
       throw error;

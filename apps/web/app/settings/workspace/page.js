@@ -1,23 +1,40 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const roleOptions = ["ADMIN", "MEMBER"];
+const editableRoles = ["ADMIN", "MEMBER"];
+
+const permissionLabels = {
+  CREATE_GOAL: "Create goals",
+  UPDATE_GOAL: "Update goals",
+  POST_ANNOUNCEMENT: "Post announcements",
+  PIN_ANNOUNCEMENT: "Pin announcements",
+  INVITE_MEMBER: "Invite members",
+  MANAGE_MEMBERS: "Manage members",
+  CREATE_ACTION_ITEM: "Create action items",
+  UPDATE_ACTION_ITEM: "Update action items",
+  DELETE_CONTENT: "Delete content",
+  MANAGE_WORKSPACE: "Manage workspace"
+};
 
 export default function WorkspaceSettingsPage() {
   const user = useAuthStore((state) => state.user);
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
   const invitations = useWorkspaceStore((state) => state.invitations);
+  const rolePermissions = useWorkspaceStore((state) => state.rolePermissions);
   const loading = useWorkspaceStore((state) => state.loading);
   const error = useWorkspaceStore((state) => state.error);
   const updateWorkspace = useWorkspaceStore((state) => state.updateWorkspace);
   const inviteMember = useWorkspaceStore((state) => state.inviteMember);
   const updateMemberRole = useWorkspaceStore((state) => state.updateMemberRole);
   const removeMember = useWorkspaceStore((state) => state.removeMember);
+  const updateRolePermissions = useWorkspaceStore((state) => state.updateRolePermissions);
   const [success, setSuccess] = useState("");
   const [workspaceForm, setWorkspaceForm] = useState({
     name: "",
@@ -39,7 +56,9 @@ export default function WorkspaceSettingsPage() {
     }
   }, [activeWorkspace]);
 
-  const canManageWorkspace = ["OWNER", "ADMIN"].includes(activeWorkspace?.role);
+  const canManageWorkspace = hasPermission(activeWorkspace, "MANAGE_WORKSPACE");
+  const canInviteMembers = hasPermission(activeWorkspace, "INVITE_MEMBER");
+  const canManageMembers = hasPermission(activeWorkspace, "MANAGE_MEMBERS");
 
   async function handleWorkspaceSubmit(event) {
     event.preventDefault();
@@ -73,6 +92,26 @@ export default function WorkspaceSettingsPage() {
     setSuccess("Member removed.");
   }
 
+  async function handlePermissionToggle(role, permission, enabled) {
+    setSuccess("");
+    const currentRolePermissions =
+      rolePermissions.find((entry) => entry.role === role)?.permissions || [];
+    const nextPermissions = enabled
+      ? currentRolePermissions
+          .filter((entry) => entry.enabled)
+          .map((entry) => entry.permission)
+          .filter((entryPermission) => entryPermission !== permission)
+      : [
+          ...currentRolePermissions
+            .filter((entry) => entry.enabled)
+            .map((entry) => entry.permission),
+          permission
+        ];
+
+    await updateRolePermissions(activeWorkspace.id, role, nextPermissions);
+    setSuccess(`${role} permissions updated.`);
+  }
+
   return (
     <ProtectedLayout>
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
@@ -84,8 +123,8 @@ export default function WorkspaceSettingsPage() {
             {activeWorkspace?.name || "Active workspace"}
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-600">
-            Update workspace details, choose the accent color, and manage the people
-            collaborating inside this space.
+            Update workspace details, choose the accent color, manage the people
+            collaborating inside this space, and tune role permissions.
           </p>
 
           <form className="mt-8 space-y-5" onSubmit={handleWorkspaceSubmit}>
@@ -126,7 +165,7 @@ export default function WorkspaceSettingsPage() {
             </label>
             {!canManageWorkspace ? (
               <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                Members can view workspace settings, but only admins can edit them.
+                Your current role can view workspace settings, but not edit them.
               </p>
             ) : null}
             {error ? (
@@ -171,7 +210,7 @@ export default function WorkspaceSettingsPage() {
                 onChange={(event) =>
                   setInviteForm((current) => ({ ...current, email: event.target.value }))
                 }
-                disabled={!canManageWorkspace}
+                disabled={!canInviteMembers}
                 className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:bg-slate-100"
                 placeholder="teammate@fredocloud.com"
               />
@@ -180,7 +219,7 @@ export default function WorkspaceSettingsPage() {
                 onChange={(event) =>
                   setInviteForm((current) => ({ ...current, role: event.target.value }))
                 }
-                disabled={!canManageWorkspace}
+                disabled={!canInviteMembers}
                 className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
               >
                 {roleOptions.map((role) => (
@@ -191,7 +230,7 @@ export default function WorkspaceSettingsPage() {
               </select>
               <button
                 type="submit"
-                disabled={!canManageWorkspace || loading}
+                disabled={!canInviteMembers || loading}
                 className="rounded-2xl px-4 py-3 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-slate-400"
                 style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
               >
@@ -214,7 +253,7 @@ export default function WorkspaceSettingsPage() {
                 {members.map((member) => {
                   const isOwner = member.role === "OWNER";
                   const canEditMember =
-                    canManageWorkspace &&
+                    canManageMembers &&
                     !isOwner &&
                     !(activeWorkspace?.role === "ADMIN" && member.role === "ADMIN");
 
@@ -298,6 +337,55 @@ export default function WorkspaceSettingsPage() {
               ) : (
                 <p className="text-sm text-slate-500">No pending invitations.</p>
               )}
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+              Role Permissions
+            </h3>
+            <div className="mt-4 space-y-4">
+              {rolePermissions.map((roleEntry) => (
+                <div key={roleEntry.role} className="rounded-[2rem] border border-slate-200 p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-950">{roleEntry.role}</h4>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Fine-grained workspace capabilities for this role.
+                      </p>
+                    </div>
+                    {!editableRoles.includes(roleEntry.role) ? (
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                        Fixed
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    {roleEntry.permissions.map((permissionEntry) => (
+                      <label
+                        key={`${roleEntry.role}-${permissionEntry.permission}`}
+                        className="flex items-center justify-between rounded-2xl border border-slate-200 px-4 py-3 text-sm"
+                      >
+                        <span className="text-slate-700">
+                          {permissionLabels[permissionEntry.permission] || permissionEntry.permission}
+                        </span>
+                        <input
+                          type="checkbox"
+                          checked={permissionEntry.enabled}
+                          disabled={!canManageMembers || !editableRoles.includes(roleEntry.role) || loading}
+                          onChange={() =>
+                            handlePermissionToggle(
+                              roleEntry.role,
+                              permissionEntry.permission,
+                              permissionEntry.enabled
+                            )
+                          }
+                        />
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </article>

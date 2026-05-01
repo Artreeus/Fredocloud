@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useGoalStore } from "@/stores/goal-store";
@@ -29,6 +30,7 @@ export default function GoalsPage() {
     search: ""
   });
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const canCreateGoal = hasPermission(activeWorkspace, "CREATE_GOAL");
 
   useEffect(() => {
     if (!activeWorkspace?.id) {
@@ -46,18 +48,12 @@ export default function GoalsPage() {
   const now = useMemo(() => new Date(), []);
 
   async function handleCreateGoal(values) {
+    setShowCreateModal(false);
+
     await createGoal({
       ...values,
       workspaceId: activeWorkspace.id,
       dueDate: values.dueDate || null
-    });
-
-    setShowCreateModal(false);
-    await fetchGoals({
-      workspaceId: activeWorkspace.id,
-      status: filters.status,
-      assigneeId: filters.assigneeId,
-      search: filters.search
     });
   }
 
@@ -76,14 +72,20 @@ export default function GoalsPage() {
               Create goals, track milestone progress, and spot overdue work across the active workspace.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowCreateModal(true)}
-            className="rounded-full px-5 py-3 text-sm font-medium text-white"
-            style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
-          >
-            Create goal
-          </button>
+          {canCreateGoal ? (
+            <button
+              type="button"
+              onClick={() => setShowCreateModal(true)}
+              className="rounded-full px-5 py-3 text-sm font-medium text-white"
+              style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+            >
+              Create goal
+            </button>
+          ) : (
+            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600">
+              Goal creation is restricted in this workspace
+            </span>
+          )}
         </div>
 
         <section className="grid gap-4 rounded-[2rem] bg-white p-6 shadow-soft ring-1 ring-slate-200 md:grid-cols-3">
@@ -161,6 +163,11 @@ export default function GoalsPage() {
                       {overdue ? (
                         <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-medium text-rose-700">
                           Overdue
+                        </span>
+                      ) : null}
+                      {goal.isOptimistic ? (
+                        <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                          Syncing
                         </span>
                       ) : null}
                     </div>

@@ -22,6 +22,7 @@ export function ActionItemFormModal({
   onClose,
   onSubmit,
   onDelete,
+  canDelete = true,
   members,
   goals,
   loading,
@@ -193,7 +194,7 @@ export function ActionItemFormModal({
           ) : null}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              {onDelete ? (
+              {onDelete && canDelete ? (
                 <button
                   type="button"
                   onClick={onDelete}

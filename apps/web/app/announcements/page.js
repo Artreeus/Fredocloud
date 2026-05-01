@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { AnnouncementFormModal } from "@/components/announcement-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { ReactionBar } from "@/components/reaction-bar";
@@ -13,13 +14,15 @@ export default function AnnouncementsPage() {
   const announcements = useAnnouncementStore((state) => state.announcements);
   const loading = useAnnouncementStore((state) => state.loading);
   const error = useAnnouncementStore((state) => state.error);
+  const pendingReactionIds = useAnnouncementStore((state) => state.pendingReactionIds);
   const fetchAnnouncements = useAnnouncementStore((state) => state.fetchAnnouncements);
   const createAnnouncement = useAnnouncementStore((state) => state.createAnnouncement);
   const togglePin = useAnnouncementStore((state) => state.togglePin);
   const toggleReaction = useAnnouncementStore((state) => state.toggleReaction);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const canCreate = ["OWNER", "ADMIN"].includes(activeWorkspace?.role);
+  const canCreate = hasPermission(activeWorkspace, "POST_ANNOUNCEMENT");
+  const canPin = hasPermission(activeWorkspace, "PIN_ANNOUNCEMENT");
 
   useEffect(() => {
     if (activeWorkspace?.id) {
@@ -102,7 +105,7 @@ export default function AnnouncementsPage() {
                   </h2>
                   <p className="mt-2 text-sm text-slate-500">By {announcement.author?.name}</p>
                 </div>
-                {canCreate ? (
+                {canPin ? (
                   <button
                     type="button"
                     onClick={() => handleTogglePin(announcement)}
@@ -119,11 +122,11 @@ export default function AnnouncementsPage() {
               />
 
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                <ReactionBar
-                  reactionSummary={announcement.reactionSummary}
-                  onToggle={(type) => handleToggleReaction(announcement.id, type)}
-                  loading={loading}
-                />
+                  <ReactionBar
+                    reactionSummary={announcement.reactionSummary}
+                    onToggle={(type) => handleToggleReaction(announcement.id, type)}
+                    loading={loading || pendingReactionIds[announcement.id]}
+                  />
                 <Link
                   href={`/announcements/${announcement.id}`}
                   className="text-sm font-medium text-slate-700"

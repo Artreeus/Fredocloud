@@ -2,6 +2,7 @@
 
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useEffect, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { ActionItemFormModal } from "@/components/action-item-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useActionItemStore } from "@/stores/action-item-store";
@@ -62,7 +63,7 @@ function sortByDueDate(items) {
   });
 }
 
-function ActionItemCard({ actionItem, accentColor, onEdit }) {
+function ActionItemCard({ actionItem, accentColor, onEdit, pending }) {
   const overdue = isOverdue(actionItem);
 
   return (
@@ -71,7 +72,7 @@ function ActionItemCard({ actionItem, accentColor, onEdit }) {
       onClick={() => onEdit(actionItem)}
       className={`w-full rounded-[1.5rem] border p-4 text-left shadow-sm transition hover:-translate-y-0.5 ${
         overdue ? "border-rose-200 bg-rose-50/60" : "border-slate-200 bg-white"
-      }`}
+      } ${pending ? "opacity-70" : ""}`}
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
@@ -80,6 +81,11 @@ function ActionItemCard({ actionItem, accentColor, onEdit }) {
         {overdue ? (
           <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-medium text-rose-700">
             Overdue
+          </span>
+        ) : null}
+        {pending ? (
+          <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+            Syncing
           </span>
         ) : null}
       </div>
@@ -114,6 +120,7 @@ export default function ActionItemsPage() {
   const filters = useActionItemStore((state) => state.filters);
   const viewMode = useActionItemStore((state) => state.viewMode);
   const selectedIds = useActionItemStore((state) => state.selectedIds);
+  const pendingStatusIds = useActionItemStore((state) => state.pendingStatusIds);
   const loading = useActionItemStore((state) => state.loading);
   const error = useActionItemStore((state) => state.error);
   const setViewMode = useActionItemStore((state) => state.setViewMode);
@@ -128,6 +135,9 @@ export default function ActionItemsPage() {
   const clearSelection = useActionItemStore((state) => state.clearSelection);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingActionItem, setEditingActionItem] = useState(null);
+  const canCreateActionItem = hasPermission(activeWorkspace, "CREATE_ACTION_ITEM");
+  const canUpdateActionItem = hasPermission(activeWorkspace, "UPDATE_ACTION_ITEM");
+  const canDeleteContent = hasPermission(activeWorkspace, "DELETE_CONTENT");
 
   useEffect(() => {
     if (!activeWorkspace?.id) {
@@ -224,14 +234,20 @@ export default function ActionItemsPage() {
                 </button>
               ))}
             </div>
-            <button
-              type="button"
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-full px-5 py-3 text-sm font-medium text-white"
-              style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
-            >
-              Create action item
-            </button>
+            {canCreateActionItem ? (
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-full px-5 py-3 text-sm font-medium text-white"
+                style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+              >
+                Create action item
+              </button>
+            ) : (
+              <span className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600">
+                Task creation is restricted in this workspace
+              </span>
+            )}
           </div>
         </div>
 
@@ -335,7 +351,7 @@ export default function ActionItemsPage() {
         ) : null}
 
         {viewMode === "kanban" ? (
-          <DragDropContext onDragEnd={handleDragEnd}>
+          <DragDropContext onDragEnd={canUpdateActionItem ? handleDragEnd : () => {}}>
             <section className="grid gap-5 xl:grid-cols-3">
               {kanbanItems.map((column) => (
                 <Droppable key={column.id} droppableId={column.id}>
@@ -367,7 +383,8 @@ export default function ActionItemsPage() {
                                 <ActionItemCard
                                   actionItem={actionItem}
                                   accentColor={activeWorkspace?.accentColor || "#2745f2"}
-                                  onEdit={setEditingActionItem}
+                                  onEdit={canUpdateActionItem ? setEditingActionItem : () => {}}
+                                  pending={pendingStatusIds[actionItem.id]}
                                 />
                               </div>
                             )}
@@ -395,6 +412,7 @@ export default function ActionItemsPage() {
                 </span>
                 <select
                   defaultValue=""
+                  disabled={!canUpdateActionItem || !selectedIds.length}
                   onChange={(event) => {
                     if (event.target.value) {
                       handleBulkStatusChange(event.target.value);
@@ -440,7 +458,7 @@ export default function ActionItemsPage() {
                       <tr
                         key={actionItem.id}
                         className={`${overdue ? "bg-rose-50/50" : ""} cursor-pointer`}
-                        onClick={() => setEditingActionItem(actionItem)}
+                        onClick={() => canUpdateActionItem && setEditingActionItem(actionItem)}
                       >
                         <td className="px-4 py-4" onClick={(event) => event.stopPropagation()}>
                           <input
@@ -514,6 +532,7 @@ export default function ActionItemsPage() {
         loading={loading}
         initialValues={editingActionItem}
         title="Edit action item"
+        canDelete={canDeleteContent}
       />
     </ProtectedLayout>
   );

@@ -1,5 +1,6 @@
 import "./globals.css";
 import { AuthBootstrap } from "@/components/auth-bootstrap";
+import { ToastRegion } from "@/components/toast-region";
 
 export const metadata = {
   title: "FredoCloud Team Hub",
@@ -10,7 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AuthBootstrap>{children}</AuthBootstrap>
+        <AuthBootstrap>
+          <ToastRegion />
+          {children}
+        </AuthBootstrap>
       </body>
     </html>
   );

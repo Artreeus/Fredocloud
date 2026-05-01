@@ -1,6 +1,8 @@
 "use client";
 
 import { apiRequest } from "@/lib/api-client";
+import { runOptimisticUpdate } from "@/lib/optimistic-update";
+import { useToastStore } from "@/stores/toast-store";
 import { create } from "zustand";
 
 function buildQuery(filters) {
@@ -29,6 +31,7 @@ export const useActionItemStore = create((set, get) => ({
   },
   viewMode: "kanban",
   selectedIds: [],
+  pendingStatusIds: {},
   loading: false,
   error: null,
   setViewMode: (viewMode) => set({ viewMode }),
@@ -113,17 +116,62 @@ export const useActionItemStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const payload = await apiRequest(`/api/action-items/${actionItemId}/status`, {
-        method: "PATCH",
-        body: JSON.stringify({ status })
+      const snapshot = get().actionItems;
+
+      return await runOptimisticUpdate({
+        snapshot,
+        apply: () =>
+          set((state) => ({
+            pendingStatusIds: {
+              ...state.pendingStatusIds,
+              [actionItemId]: true
+            },
+            actionItems: state.actionItems.map((actionItem) =>
+              actionItem.id === actionItemId
+                ? {
+                    ...actionItem,
+                    status,
+                    completedAt: status === "DONE" ? new Date().toISOString() : null
+                  }
+                : actionItem
+            ),
+            error: null
+          })),
+        commit: async () => {
+          const payload = await apiRequest(`/api/action-items/${actionItemId}/status`, {
+            method: "PATCH",
+            body: JSON.stringify({ status })
+          });
+
+          set((state) => ({
+            pendingStatusIds: {
+              ...state.pendingStatusIds,
+              [actionItemId]: false
+            },
+            actionItems: state.actionItems.map((actionItem) =>
+              actionItem.id === actionItemId ? payload.actionItem : actionItem
+            ),
+            error: null
+          }));
+
+          return payload.actionItem;
+        },
+        rollback: (previous) =>
+          set((state) => ({
+            actionItems: previous,
+            pendingStatusIds: {
+              ...state.pendingStatusIds,
+              [actionItemId]: false
+            },
+            error: "Could not update action item status"
+          })),
+        onError: (error) =>
+          useToastStore.getState().pushToast({
+            type: "error",
+            message:
+              error.message || "Action item status update failed. The optimistic change was rolled back."
+          })
       });
-      set((state) => ({
-        actionItems: state.actionItems.map((actionItem) =>
-          actionItem.id === actionItemId ? payload.actionItem : actionItem
-        ),
-        error: null
-      }));
-      return payload.actionItem;
     } catch (error) {
       set({ error: error.message });
       throw error;

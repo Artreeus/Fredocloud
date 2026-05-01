@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useGoalStore } from "@/stores/goal-store";
@@ -32,6 +33,7 @@ export default function GoalDetailPage({ params }) {
   });
   const [updateText, setUpdateText] = useState("");
   const [success, setSuccess] = useState("");
+  const canUpdateGoal = hasPermission(activeWorkspace, "UPDATE_GOAL");
 
   useEffect(() => {
     if (params?.id) {
@@ -93,14 +95,16 @@ export default function GoalDetailPage({ params }) {
                     {goal.description || "No description provided yet."}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(true)}
-                  className="rounded-full px-5 py-3 text-sm font-medium text-white"
-                  style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
-                >
-                  Edit goal
-                </button>
+                {canUpdateGoal ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowEditModal(true)}
+                    className="rounded-full px-5 py-3 text-sm font-medium text-white"
+                    style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+                  >
+                    Edit goal
+                  </button>
+                ) : null}
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -160,6 +164,7 @@ export default function GoalDetailPage({ params }) {
                           max="100"
                           step="10"
                           value={milestone.progress}
+                          disabled={!canUpdateGoal}
                           onChange={(event) =>
                             handleMilestoneProgressChange(milestone.id, event.target.value)
                           }
@@ -192,7 +197,8 @@ export default function GoalDetailPage({ params }) {
                     onChange={(event) =>
                       setMilestoneForm((current) => ({ ...current, title: event.target.value }))
                     }
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                    disabled={!canUpdateGoal}
+                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
                     placeholder="New milestone title"
                   />
                   <input
@@ -206,11 +212,12 @@ export default function GoalDetailPage({ params }) {
                         progress: Number(event.target.value)
                       }))
                     }
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                    disabled={!canUpdateGoal}
+                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
                   />
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !canUpdateGoal}
                     className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white disabled:bg-slate-400"
                   >
                     Add milestone
@@ -233,12 +240,13 @@ export default function GoalDetailPage({ params }) {
                 <textarea
                   value={updateText}
                   onChange={(event) => setUpdateText(event.target.value)}
-                  className="min-h-32 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                  disabled={!canUpdateGoal}
+                  className="min-h-32 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
                   placeholder="Share a progress update with the team..."
                 />
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !canUpdateGoal}
                   className="rounded-2xl px-5 py-3 text-sm font-medium text-white disabled:bg-slate-400"
                   style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
                 >

@@ -1,6 +1,8 @@
 "use client";
 
 import { apiRequest } from "@/lib/api-client";
+import { runOptimisticUpdate } from "@/lib/optimistic-update";
+import { useToastStore } from "@/stores/toast-store";
 import { create } from "zustand";
 
 function buildGoalQuery(filters) {
@@ -54,15 +56,67 @@ export const useGoalStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const payload = await apiRequest("/api/goals", {
-        method: "POST",
-        body: JSON.stringify(values)
+      const snapshot = get().goals;
+      const tempId = `temp-goal-${Date.now()}`;
+      const progress = values.milestones?.length
+        ? Math.round(
+            values.milestones.reduce((total, milestone) => total + Number(milestone.progress || 0), 0) /
+              values.milestones.length
+          )
+        : 0;
+
+      return await runOptimisticUpdate({
+        snapshot,
+        apply: () =>
+          set((state) => ({
+            goals: [
+              {
+                id: tempId,
+                title: values.title,
+                description: values.description || null,
+                status: values.status || "NOT_STARTED",
+                priority: values.priority || "MEDIUM",
+                progress,
+                dueDate: values.dueDate || null,
+                startDate: null,
+                completedAt: null,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                workspaceId: values.workspaceId,
+                assignee: null,
+                createdBy: null,
+                milestones: values.milestones || [],
+                updates: [],
+                isOptimistic: true
+              },
+              ...state.goals
+            ],
+            error: null
+          })),
+        commit: async () => {
+          const payload = await apiRequest("/api/goals", {
+            method: "POST",
+            body: JSON.stringify(values)
+          });
+
+          set((state) => ({
+            goals: state.goals.map((goal) => (goal.id === tempId ? payload.goal : goal)),
+            error: null
+          }));
+
+          return payload.goal;
+        },
+        rollback: (previousGoals) =>
+          set({
+            goals: previousGoals,
+            error: "Could not create goal"
+          }),
+        onError: (error) =>
+          useToastStore.getState().pushToast({
+            type: "error",
+            message: error.message || "Could not create goal. The optimistic change was rolled back."
+          })
       });
-      set((state) => ({
-        goals: [payload.goal, ...state.goals],
-        error: null
-      }));
-      return payload.goal;
     } catch (error) {
       set({ error: error.message });
       throw error;

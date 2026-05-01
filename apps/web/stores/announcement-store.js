@@ -1,13 +1,79 @@
 "use client";
 
 import { apiRequest } from "@/lib/api-client";
+import { runOptimisticUpdate } from "@/lib/optimistic-update";
+import { useToastStore } from "@/stores/toast-store";
 import { create } from "zustand";
+
+function applyReactionSummary(reactionSummary, type) {
+  const existing = reactionSummary.find((entry) => entry.type === type);
+  const activeReaction = reactionSummary.find((entry) => entry.reacted);
+  let nextSummary = reactionSummary.map((entry) => ({ ...entry }));
+
+  if (activeReaction && activeReaction.type !== type) {
+    nextSummary = nextSummary
+      .map((entry) =>
+        entry.type === activeReaction.type
+          ? {
+              ...entry,
+              reacted: false,
+              count: Math.max(0, entry.count - 1)
+            }
+          : entry
+      )
+      .filter((entry) => entry.count > 0 || entry.reacted);
+  }
+
+  if (existing?.reacted) {
+    nextSummary = nextSummary
+      .map((entry) =>
+        entry.type === type
+          ? {
+              ...entry,
+              reacted: false,
+              count: Math.max(0, entry.count - 1)
+            }
+          : entry
+      )
+      .filter((entry) => entry.count > 0 || entry.reacted);
+  } else if (existing) {
+    nextSummary = nextSummary.map((entry) =>
+      entry.type === type
+        ? {
+            ...entry,
+            reacted: true,
+            count: entry.count + 1
+          }
+        : entry
+    );
+  } else {
+    nextSummary = [
+      ...nextSummary,
+      {
+        type,
+        emoji:
+          {
+            LIKE: "👍",
+            CELEBRATE: "🎉",
+            SUPPORT: "❤️",
+            INSIGHTFUL: "💡"
+          }[type] || "👍",
+        label: type,
+        count: 1,
+        reacted: true
+      }
+    ];
+  }
+
+  return nextSummary;
+}
 
 export const useAnnouncementStore = create((set, get) => ({
   announcements: [],
   currentAnnouncement: null,
   comments: [],
   pagination: null,
+  pendingReactionIds: {},
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
@@ -107,22 +173,78 @@ export const useAnnouncementStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const payload = await apiRequest(`/api/announcements/${announcementId}/reactions`, {
-        method: "POST",
-        body: JSON.stringify({ type })
-      });
+      const snapshot = {
+        announcements: get().announcements,
+        currentAnnouncement: get().currentAnnouncement
+      };
 
-      set((state) => ({
-        currentAnnouncement:
-          state.currentAnnouncement?.id === announcementId
-            ? { ...state.currentAnnouncement, reactionSummary: payload.announcement.reactionSummary }
-            : state.currentAnnouncement,
-        announcements: state.announcements.map((announcement) =>
-          announcement.id === announcementId ? payload.announcement : announcement
-        ),
-        error: null
-      }));
-      return payload.announcement;
+      return await runOptimisticUpdate({
+        snapshot,
+        apply: () =>
+          set((state) => ({
+            pendingReactionIds: {
+              ...state.pendingReactionIds,
+              [announcementId]: true
+            },
+            currentAnnouncement:
+              state.currentAnnouncement?.id === announcementId
+                ? {
+                    ...state.currentAnnouncement,
+                    reactionSummary: applyReactionSummary(
+                      state.currentAnnouncement.reactionSummary || [],
+                      type
+                    )
+                  }
+                : state.currentAnnouncement,
+            announcements: state.announcements.map((announcement) =>
+              announcement.id === announcementId
+                ? {
+                    ...announcement,
+                    reactionSummary: applyReactionSummary(announcement.reactionSummary || [], type)
+                  }
+                : announcement
+            ),
+            error: null
+          })),
+        commit: async () => {
+          const payload = await apiRequest(`/api/announcements/${announcementId}/reactions`, {
+            method: "POST",
+            body: JSON.stringify({ type })
+          });
+
+          set((state) => ({
+            pendingReactionIds: {
+              ...state.pendingReactionIds,
+              [announcementId]: false
+            },
+            currentAnnouncement:
+              state.currentAnnouncement?.id === announcementId
+                ? { ...state.currentAnnouncement, reactionSummary: payload.announcement.reactionSummary }
+                : state.currentAnnouncement,
+            announcements: state.announcements.map((announcement) =>
+              announcement.id === announcementId ? payload.announcement : announcement
+            ),
+            error: null
+          }));
+
+          return payload.announcement;
+        },
+        rollback: (previous) =>
+          set((state) => ({
+            announcements: previous.announcements,
+            currentAnnouncement: previous.currentAnnouncement,
+            pendingReactionIds: {
+              ...state.pendingReactionIds,
+              [announcementId]: false
+            },
+            error: "Could not update reaction"
+          })),
+        onError: (error) =>
+          useToastStore.getState().pushToast({
+            type: "error",
+            message: error.message || "Reaction update failed. The optimistic change was rolled back."
+          })
+      });
     } catch (error) {
       set({ error: error.message });
       throw error;
