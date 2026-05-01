@@ -2,6 +2,7 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const express = require("express");
 const { authRouter } = require("./routes/auth.routes");
+const { goalRouter } = require("./routes/goal.routes");
 const { uploadRouter } = require("./routes/upload.routes");
 const { workspaceRouter } = require("./routes/workspace.routes");
 
@@ -25,6 +26,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/goals", goalRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/workspaces", workspaceRouter);
 
