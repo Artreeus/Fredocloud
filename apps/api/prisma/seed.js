@@ -32,7 +32,8 @@ async function main() {
       ownerId: demoUser.id,
       name: "Demo Workspace",
       slug: slugify("Demo Workspace"),
-      description: "Seeded workspace for milestone verification."
+      description: "Seeded workspace for milestone verification.",
+      accentColor: "#2745f2"
     }
   });
 
