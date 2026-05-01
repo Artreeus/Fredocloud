@@ -292,10 +292,43 @@ async function me(req, res, next) {
   }
 }
 
+async function updateMe(req, res, next) {
+  try {
+    const { name, avatarUrl } = req.body;
+
+    if (!name && !avatarUrl) {
+      throw createError("At least one profile field is required", 400);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: req.user.id },
+      data: {
+        ...(name ? { name } : {}),
+        ...(avatarUrl ? { avatarUrl } : {})
+      },
+      include: {
+        workspaceMemberships: {
+          include: {
+            workspace: true
+          }
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: buildPublicUser(updatedUser)
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   login,
   logout,
   me,
   refresh,
-  register
+  register,
+  updateMe
 };
