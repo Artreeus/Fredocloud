@@ -56,7 +56,7 @@ export default function AnnouncementDetailPage({ params }) {
     <ProtectedLayout>
       {announcement ? (
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+          <article className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
             <div className="flex flex-wrap items-center gap-2">
               {announcement.pinned ? (
                 <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
@@ -67,7 +67,7 @@ export default function AnnouncementDetailPage({ params }) {
                 {new Date(announcement.publishedAt || announcement.createdAt).toLocaleString()}
               </span>
             </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950">
               {announcement.title}
             </h1>
             <p className="mt-3 text-sm text-slate-500">By {announcement.author?.name}</p>
@@ -86,11 +86,11 @@ export default function AnnouncementDetailPage({ params }) {
             </div>
           </article>
 
-          <article className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+          <article className="rounded-[2.15rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Comments
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+            <h2 className="mt-3 font-display text-3xl text-slate-950">
               Discussion
             </h2>
 
@@ -98,7 +98,7 @@ export default function AnnouncementDetailPage({ params }) {
               <textarea
                 value={commentBody}
                 onChange={(event) => setCommentBody(event.target.value)}
-                className="min-h-28 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                 placeholder="Add a comment..."
               />
               <button
@@ -121,7 +121,7 @@ export default function AnnouncementDetailPage({ params }) {
           </article>
         </section>
       ) : (
-        <div className="rounded-[2rem] bg-white p-8 text-sm text-slate-500 shadow-soft ring-1 ring-slate-200">
+        <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
           {loading ? "Loading announcement..." : "Announcement not found."}
         </div>
       )}

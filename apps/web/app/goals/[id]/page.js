@@ -83,9 +83,9 @@ export default function GoalDetailPage({ params }) {
       {goal ? (
         <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
           <article className="space-y-6">
-            <section className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+            <section className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
               <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
+                <div className="max-w-2xl">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                       {goal.status.replaceAll("_", " ")}
@@ -94,9 +94,7 @@ export default function GoalDetailPage({ params }) {
                       {goal.priority}
                     </span>
                   </div>
-                  <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
-                    {goal.title}
-                  </h1>
+                  <h1 className="mt-4 font-display text-5xl text-slate-950">{goal.title}</h1>
                   <p className="mt-4 text-sm leading-7 text-slate-600">
                     {goal.description || "No description provided yet."}
                   </p>
@@ -114,17 +112,17 @@ export default function GoalDetailPage({ params }) {
               </div>
 
               <div className="mt-8 grid gap-4 md:grid-cols-3">
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Owner</p>
                   <p className="mt-2 text-sm font-medium text-slate-900">
                     {goal.assignee?.name || "Unassigned"}
                   </p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Due date</p>
                   <p className="mt-2 text-sm font-medium text-slate-900">{formatDate(goal.dueDate)}</p>
                 </div>
-                <div className="rounded-3xl bg-slate-50 p-4">
+                <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-4">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Progress</p>
                   <p className="mt-2 text-sm font-medium text-slate-900">{goal.progress}%</p>
                 </div>
@@ -141,26 +139,28 @@ export default function GoalDetailPage({ params }) {
               </div>
             </section>
 
-            <section className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+            <section className="rounded-[2.15rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
                     Milestones
                   </p>
-                  <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                    Track progress
-                  </h2>
+                  <h2 className="mt-3 font-display text-3xl text-slate-950">Track progress</h2>
                 </div>
               </div>
 
               <div className="mt-6 space-y-4">
                 {goal.milestones.map((milestone) => (
-                  <div key={milestone.id} className="rounded-3xl border border-slate-200 p-5">
+                  <div
+                    key={milestone.id}
+                    className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-5"
+                  >
                     <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
                         <h3 className="text-lg font-semibold text-slate-950">{milestone.title}</h3>
                         <p className="mt-2 text-sm text-slate-500">
-                          {milestone.owner?.name || "Unassigned"} · Due {formatDate(milestone.dueDate)}
+                          {milestone.owner?.name || "Unassigned"} | Due{" "}
+                          {formatDate(milestone.dueDate)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -175,7 +175,9 @@ export default function GoalDetailPage({ params }) {
                             handleMilestoneProgressChange(milestone.id, event.target.value)
                           }
                         />
-                        <span className="text-sm font-medium text-slate-700">{milestone.progress}%</span>
+                        <span className="text-sm font-medium text-slate-700">
+                          {milestone.progress}%
+                        </span>
                       </div>
                     </div>
                     <div className="mt-4 h-3 rounded-full bg-slate-100">
@@ -195,7 +197,10 @@ export default function GoalDetailPage({ params }) {
                 ) : null}
               </div>
 
-              <form className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200 bg-slate-50 p-5" onSubmit={handleAddMilestone}>
+              <form
+                className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200/80 bg-slate-50/80 p-5"
+                onSubmit={handleAddMilestone}
+              >
                 <div className="grid gap-4 md:grid-cols-[1fr_140px_auto]">
                   <input
                     type="text"
@@ -204,7 +209,7 @@ export default function GoalDetailPage({ params }) {
                       setMilestoneForm((current) => ({ ...current, title: event.target.value }))
                     }
                     disabled={!canUpdateGoal}
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
+                    className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:bg-slate-100"
                     placeholder="New milestone title"
                   />
                   <input
@@ -219,7 +224,7 @@ export default function GoalDetailPage({ params }) {
                       }))
                     }
                     disabled={!canUpdateGoal}
-                    className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
+                    className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:bg-slate-100"
                   />
                   <button
                     type="submit"
@@ -234,20 +239,18 @@ export default function GoalDetailPage({ params }) {
           </article>
 
           <article className="space-y-6">
-            <section className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+            <section className="rounded-[2.15rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
                 Activity Feed
               </p>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                Progress updates
-              </h2>
+              <h2 className="mt-3 font-display text-3xl text-slate-950">Progress updates</h2>
 
               <form className="mt-6 space-y-4" onSubmit={handlePostUpdate}>
                 <textarea
                   value={updateText}
                   onChange={(event) => setUpdateText(event.target.value)}
                   disabled={!canUpdateGoal}
-                  className="min-h-32 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none disabled:bg-slate-100"
+                  className="min-h-32 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:bg-slate-100"
                   placeholder="Share a progress update with the team..."
                 />
                 <button
@@ -262,7 +265,10 @@ export default function GoalDetailPage({ params }) {
 
               <div className="mt-8 space-y-4">
                 {goal.updates.map((update) => (
-                  <div key={update.id} className="rounded-3xl bg-slate-50 p-4">
+                  <div
+                    key={update.id}
+                    className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-4"
+                  >
                     <div className="flex items-center justify-between gap-3">
                       <p className="text-sm font-medium text-slate-900">{update.author?.name}</p>
                       <p className="text-xs text-slate-500">
@@ -281,7 +287,7 @@ export default function GoalDetailPage({ params }) {
           </article>
         </section>
       ) : (
-        <div className="rounded-[2rem] bg-white p-8 text-sm text-slate-500 shadow-soft ring-1 ring-slate-200">
+        <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
           {loading ? "Loading goal details..." : "Goal not found."}
         </div>
       )}

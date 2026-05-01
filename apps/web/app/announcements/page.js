@@ -61,12 +61,12 @@ export default function AnnouncementsPage() {
   return (
     <ProtectedLayout>
       <section className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-4 rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+          <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Announcements
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950">
               Team communication
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
@@ -93,7 +93,7 @@ export default function AnnouncementsPage() {
           {announcements.map((announcement) => (
             <article
               key={announcement.id}
-              className="rounded-[2rem] bg-white p-6 shadow-soft ring-1 ring-slate-200"
+              className="rounded-[2.1rem] border border-white/60 bg-white/80 p-6 shadow-float backdrop-blur-xl"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
@@ -107,7 +107,7 @@ export default function AnnouncementsPage() {
                       {new Date(announcement.publishedAt || announcement.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">
+                  <h2 className="mt-4 font-display text-3xl text-slate-950">
                     {announcement.title}
                   </h2>
                   <p className="mt-2 text-sm text-slate-500">By {announcement.author?.name}</p>
@@ -116,7 +116,7 @@ export default function AnnouncementsPage() {
                   <button
                     type="button"
                     onClick={() => handleTogglePin(announcement)}
-                    className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-700"
+                    className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm text-slate-700"
                   >
                     {announcement.pinned ? "Unpin" : "Pin"}
                   </button>
@@ -145,7 +145,7 @@ export default function AnnouncementsPage() {
           ))}
 
           {!loading && !announcements.length ? (
-            <div className="rounded-[2rem] bg-white p-8 text-sm text-slate-500 shadow-soft ring-1 ring-slate-200">
+            <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
               No announcements yet for this workspace.
             </div>
           ) : null}

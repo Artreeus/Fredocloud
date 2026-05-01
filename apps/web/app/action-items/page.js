@@ -71,8 +71,8 @@ function ActionItemCard({ actionItem, accentColor, onEdit, pending }) {
     <button
       type="button"
       onClick={() => onEdit(actionItem)}
-      className={`w-full rounded-[1.5rem] border p-4 text-left shadow-sm transition hover:-translate-y-0.5 ${
-        overdue ? "border-rose-200 bg-rose-50/60" : "border-slate-200 bg-white"
+      className={`w-full rounded-[1.6rem] border p-4 text-left shadow-sm backdrop-blur-xl transition hover:-translate-y-0.5 ${
+        overdue ? "border-rose-200 bg-rose-50/70" : "border-white/60 bg-white/84"
       } ${pending ? "opacity-70" : ""}`}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -90,7 +90,7 @@ function ActionItemCard({ actionItem, accentColor, onEdit, pending }) {
           </span>
         ) : null}
       </div>
-      <h3 className="mt-4 text-base font-semibold text-slate-950">{actionItem.title}</h3>
+      <h3 className="mt-4 font-display text-xl text-slate-950">{actionItem.title}</h3>
       <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
         {actionItem.description || "No description added yet."}
       </p>
@@ -220,12 +220,12 @@ export default function ActionItemsPage() {
   return (
     <ProtectedLayout>
       <section className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-4 rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+          <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Action Items
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950">
               Task execution board
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
@@ -233,7 +233,7 @@ export default function ActionItemsPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-full bg-white p-1 shadow-soft ring-1 ring-slate-200">
+            <div className="rounded-full border border-white/60 bg-white/80 p-1 shadow-soft backdrop-blur-xl">
               {["kanban", "list"].map((mode) => (
                 <button
                   key={mode}
@@ -265,13 +265,13 @@ export default function ActionItemsPage() {
           </div>
         </div>
 
-        <section className="grid gap-4 rounded-[2rem] bg-white p-6 shadow-soft ring-1 ring-slate-200 md:grid-cols-3 xl:grid-cols-6">
+        <section className="grid gap-4 rounded-[2.1rem] border border-white/60 bg-white/76 p-6 shadow-float backdrop-blur-xl md:grid-cols-3 xl:grid-cols-6">
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Priority</span>
             <select
               value={filters.priority}
               onChange={(event) => setFilters({ priority: event.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All priorities</option>
               {priorityOptions.map((priority) => (
@@ -286,7 +286,7 @@ export default function ActionItemsPage() {
             <select
               value={filters.assigneeId}
               onChange={(event) => setFilters({ assigneeId: event.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All assignees</option>
               {members.map((member) => (
@@ -301,7 +301,7 @@ export default function ActionItemsPage() {
             <select
               value={filters.status}
               onChange={(event) => setFilters({ status: event.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All statuses</option>
               <option value="OPEN">To Do</option>
@@ -314,7 +314,7 @@ export default function ActionItemsPage() {
             <select
               value={filters.goalId}
               onChange={(event) => setFilters({ goalId: event.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All goals</option>
               {goals.map((goal) => (
@@ -332,7 +332,7 @@ export default function ActionItemsPage() {
                 const [sortBy, sortOrder] = event.target.value.split(":");
                 setFilters({ sortBy, sortOrder });
               }}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="dueDate:asc">Due date</option>
               <option value="priority:desc">Priority</option>
@@ -346,7 +346,7 @@ export default function ActionItemsPage() {
               type="text"
               value={filters.search}
               onChange={(event) => setFilters({ search: event.target.value })}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               placeholder="Search titles"
             />
           </label>
@@ -369,14 +369,14 @@ export default function ActionItemsPage() {
                     <article
                       ref={provided.innerRef}
                       {...provided.droppableProps}
-                      className={`rounded-[2rem] p-5 shadow-soft ring-1 ${
+                      className={`rounded-[2.05rem] border p-5 shadow-float backdrop-blur-xl ${
                         snapshot.isDraggingOver
-                          ? "bg-brand-50 ring-brand-200"
-                          : "bg-white ring-slate-200"
+                          ? "border-brand-200 bg-brand-50/90"
+                          : "border-white/60 bg-white/76"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <h2 className="text-lg font-semibold text-slate-950">{column.title}</h2>
+                        <h2 className="font-display text-2xl text-slate-950">{column.title}</h2>
                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
                           {column.items.length}
                         </span>
@@ -402,7 +402,7 @@ export default function ActionItemsPage() {
                         ))}
                         {provided.placeholder}
                         {!column.items.length ? (
-                          <div className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+                          <div className="rounded-[1.6rem] border border-dashed border-slate-200 bg-white/70 px-4 py-8 text-center text-sm text-slate-500">
                             No items in {column.title.toLowerCase()}.
                           </div>
                         ) : null}
@@ -414,7 +414,7 @@ export default function ActionItemsPage() {
             </section>
           </DragDropContext>
         ) : (
-          <section className="rounded-[2rem] bg-white p-6 shadow-soft ring-1 ring-slate-200">
+          <section className="rounded-[2.1rem] border border-white/60 bg-white/76 p-6 shadow-float backdrop-blur-xl">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600">
@@ -429,7 +429,7 @@ export default function ActionItemsPage() {
                       event.target.value = "";
                     }
                   }}
-                  className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                  className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                 >
                   <option value="">Bulk status</option>
                   <option value="OPEN">To Do</option>
@@ -514,7 +514,7 @@ export default function ActionItemsPage() {
             </div>
 
             {!loading && !tableItems.length ? (
-              <div className="mt-6 rounded-[1.5rem] bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+              <div className="mt-6 rounded-[1.6rem] border border-slate-200/70 bg-white/70 px-4 py-8 text-center text-sm text-slate-500">
                 No action items match the current filters.
               </div>
             ) : null}

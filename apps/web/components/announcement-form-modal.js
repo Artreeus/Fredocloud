@@ -39,13 +39,13 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-3xl rounded-[2rem] bg-white p-8 shadow-soft">
+      <div className="w-full max-w-3xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Announcements
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+            <h2 className="mt-3 font-display text-3xl text-slate-950">
               Create announcement
             </h2>
           </div>
@@ -65,7 +65,7 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             />
           </label>
           <div>

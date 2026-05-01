@@ -71,13 +71,13 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-2xl rounded-[2rem] bg-white p-8 shadow-soft">
+      <div className="w-full max-w-2xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Goals
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">{title}</h2>
+            <h2 className="mt-3 font-display text-3xl text-slate-950">{title}</h2>
           </div>
           <button
             type="button"
@@ -95,7 +95,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
               type="text"
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             />
           </label>
           <label className="block">
@@ -105,7 +105,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
               onChange={(event) =>
                 setForm((current) => ({ ...current, description: event.target.value }))
               }
-              className="min-h-28 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             />
           </label>
           <div className="grid gap-4 md:grid-cols-2">
@@ -116,7 +116,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                 onChange={(event) =>
                   setForm((current) => ({ ...current, assigneeId: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 <option value="">Unassigned</option>
                 {members.map((member) => (
@@ -132,7 +132,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                 type="date"
                 value={form.dueDate}
                 onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               />
             </label>
           </div>
@@ -142,7 +142,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
               <select
                 value={form.status}
                 onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 <option value="NOT_STARTED">Not Started</option>
                 <option value="IN_PROGRESS">In Progress</option>
@@ -157,7 +157,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                 onChange={(event) =>
                   setForm((current) => ({ ...current, priority: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
@@ -167,7 +167,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
             </label>
           </div>
           {!initialValues ? (
-            <div className="rounded-[2rem] border border-slate-200 bg-slate-50 p-5">
+            <div className="rounded-[2rem] border border-slate-200/80 bg-slate-50/80 p-5">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
                   Milestones
@@ -199,7 +199,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                           )
                         }))
                       }
-                      className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                      className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                       placeholder="Milestone title"
                     />
                     <input
@@ -217,7 +217,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                           )
                         }))
                       }
-                      className="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                      className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                       placeholder="0-100"
                     />
                   </div>

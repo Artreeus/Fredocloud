@@ -71,12 +71,12 @@ export default function GoalsPage() {
   return (
     <ProtectedLayout>
       <section className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-4 rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+          <div className="max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Goals
             </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950">
               Team goals
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
@@ -99,13 +99,13 @@ export default function GoalsPage() {
           )}
         </div>
 
-        <section className="grid gap-4 rounded-[2rem] bg-white p-6 shadow-soft ring-1 ring-slate-200 md:grid-cols-3">
+        <section className="grid gap-4 rounded-[2.1rem] border border-white/60 bg-white/76 p-6 shadow-float backdrop-blur-xl md:grid-cols-3">
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Status</span>
             <select
               value={filters.status}
               onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All statuses</option>
               <option value="NOT_STARTED">Not Started</option>
@@ -121,7 +121,7 @@ export default function GoalsPage() {
               onChange={(event) =>
                 setFilters((current) => ({ ...current, assigneeId: event.target.value }))
               }
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             >
               <option value="">All owners</option>
               {members.map((member) => (
@@ -137,7 +137,7 @@ export default function GoalsPage() {
               type="text"
               value={filters.search}
               onChange={(event) => setFilters((current) => ({ ...current, search: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200/90 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               placeholder="Search by goal title"
             />
           </label>
@@ -154,8 +154,8 @@ export default function GoalsPage() {
               <Link
                 key={goal.id}
                 href={`/goals/${goal.id}`}
-                className={`rounded-[2rem] bg-white p-6 shadow-soft ring-1 transition ${
-                  overdue ? "ring-rose-300" : "ring-slate-200 hover:ring-slate-300"
+                className={`rounded-[2.1rem] border bg-white/80 p-6 shadow-float backdrop-blur-xl transition ${
+                  overdue ? "border-rose-200 ring-1 ring-rose-200/70" : "border-white/60 hover:border-slate-300"
                 }`}
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -178,14 +178,14 @@ export default function GoalsPage() {
                         </span>
                       ) : null}
                     </div>
-                    <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-950">
+                    <h2 className="mt-4 font-display text-3xl text-slate-950">
                       {goal.title}
                     </h2>
                     <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
                       {goal.description || "No description provided yet."}
                     </p>
                   </div>
-                  <div className="min-w-[180px] rounded-3xl bg-slate-50 p-4">
+                  <div className="min-w-[200px] rounded-[1.75rem] border border-slate-200/80 bg-white/84 p-4">
                     <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Due date</p>
                     <p className={`mt-2 text-sm font-medium ${overdue ? "text-rose-700" : "text-slate-900"}`}>
                       {formatDate(goal.dueDate)}
@@ -215,7 +215,7 @@ export default function GoalsPage() {
           })}
 
           {!loading && !goals.length ? (
-            <div className="rounded-[2rem] bg-white p-8 text-sm text-slate-500 shadow-soft ring-1 ring-slate-200">
+            <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
               No goals match these filters yet.
             </div>
           ) : null}

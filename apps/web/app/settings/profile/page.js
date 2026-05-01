@@ -50,11 +50,11 @@ export default function ProfilePage() {
   return (
     <ProtectedLayout>
       <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+        <article className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
             User Profile
           </p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
+          <h1 className="mt-4 font-display text-5xl text-slate-950">
             Profile settings
           </h1>
           <p className="mt-4 text-sm leading-7 text-slate-600">
@@ -69,13 +69,13 @@ export default function ProfilePage() {
                 type="text"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               />
             </label>
 
             <div>
               <span className="mb-2 block text-sm font-medium text-slate-700">Avatar</span>
-              <label className="flex cursor-pointer items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-4 text-sm text-slate-600 transition hover:border-brand-300 hover:bg-brand-50">
+              <label className="flex cursor-pointer items-center justify-between rounded-[1.7rem] border border-dashed border-slate-300 bg-white/80 px-4 py-4 text-sm text-slate-600 transition hover:border-brand-300 hover:bg-brand-50">
                 <span>Choose a new image</span>
                 <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700">
                   Upload
@@ -94,8 +94,8 @@ export default function ProfilePage() {
           </form>
         </article>
 
-        <article className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
-          <h2 className="text-lg font-semibold text-slate-950">Current profile</h2>
+        <article className="rounded-[2.3rem] border border-slate-900/10 bg-slate-950 p-8 text-white shadow-float">
+          <h2 className="font-display text-3xl text-white">Current profile</h2>
           <div className="mt-6 flex items-center gap-4">
             {user?.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -105,13 +105,13 @@ export default function ProfilePage() {
                 className="h-20 w-20 rounded-full object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-100 text-xl font-semibold text-brand-700">
+              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/12 text-xl font-semibold text-white">
                 {user?.name?.slice(0, 1)?.toUpperCase() || "F"}
               </div>
             )}
             <div>
-              <p className="text-lg font-semibold text-slate-950">{user?.name}</p>
-              <p className="text-sm text-slate-500">{user?.email}</p>
+              <p className="text-lg font-semibold text-white">{user?.name}</p>
+              <p className="text-sm text-slate-300">{user?.email}</p>
             </div>
           </div>
         </article>

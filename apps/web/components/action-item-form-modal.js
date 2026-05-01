@@ -79,13 +79,13 @@ export function ActionItemFormModal({
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-3xl rounded-[2rem] bg-white p-8 shadow-soft">
+      <div className="w-full max-w-3xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
               Action Items
             </p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">{title}</h2>
+            <h2 className="mt-3 font-display text-3xl text-slate-950">{title}</h2>
           </div>
           <button
             type="button"
@@ -103,7 +103,7 @@ export function ActionItemFormModal({
               type="text"
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             />
           </label>
           <label className="block">
@@ -113,7 +113,7 @@ export function ActionItemFormModal({
               onChange={(event) =>
                 setForm((current) => ({ ...current, description: event.target.value }))
               }
-              className="min-h-28 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
             />
           </label>
           <div className="grid gap-4 md:grid-cols-2">
@@ -124,7 +124,7 @@ export function ActionItemFormModal({
                 onChange={(event) =>
                   setForm((current) => ({ ...current, assigneeId: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 <option value="">Unassigned</option>
                 {members.map((member) => (
@@ -139,7 +139,7 @@ export function ActionItemFormModal({
               <select
                 value={form.goalId}
                 onChange={(event) => setForm((current) => ({ ...current, goalId: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 <option value="">No linked goal</option>
                 {goals.map((goal) => (
@@ -156,7 +156,7 @@ export function ActionItemFormModal({
                 onChange={(event) =>
                   setForm((current) => ({ ...current, priority: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 {priorityOptions.map((priority) => (
                   <option key={priority} value={priority}>
@@ -170,7 +170,7 @@ export function ActionItemFormModal({
               <select
                 value={form.status}
                 onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               >
                 {statusOptions.map((status) => (
                   <option key={status} value={status}>
@@ -185,7 +185,7 @@ export function ActionItemFormModal({
                 type="date"
                 value={form.dueDate}
                 onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
               />
             </label>
           </div>
