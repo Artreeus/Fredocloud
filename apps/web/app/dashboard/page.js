@@ -52,18 +52,18 @@ export default function DashboardPage() {
   return (
     <ProtectedLayout>
       <section className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">
-        <article className="rounded-[2rem] bg-white p-8 shadow-soft ring-1 ring-slate-200">
+        <article className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
                 Active Workspace
               </p>
-              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
+              <h1 className="mt-4 font-display text-5xl text-slate-950">
                 {activeWorkspace?.name || "Workspace dashboard"}
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-600">
-                Switch workspaces from the navbar, manage members from settings, and
-                create new collaboration spaces from here.
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600">
+                Switch workspaces from the navbar, manage members from settings, tune permissions,
+                and create new collaboration spaces from here.
               </p>
             </div>
             <button
@@ -76,28 +76,44 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <div className="rounded-3xl bg-slate-50 p-5">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <div className="rounded-[1.9rem] border border-slate-200/80 bg-white/84 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Description</p>
               <p className="mt-3 text-sm text-slate-700">
                 {activeWorkspace?.description || "No description added yet."}
               </p>
             </div>
-            <div className="rounded-3xl bg-slate-50 p-5">
+            <div className="rounded-[1.9rem] border border-slate-200/80 bg-white/84 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Role</p>
               <p className="mt-3 text-sm font-medium text-slate-900">
                 {activeWorkspace?.role || "Member"}
               </p>
             </div>
-            <div className="rounded-3xl bg-slate-50 p-5">
+            <div className="rounded-[1.9rem] border border-slate-200/80 bg-white/84 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total workspaces</p>
               <p className="mt-3 text-sm font-medium text-slate-900">{workspaces.length}</p>
             </div>
           </div>
 
+          <div className="mt-8 rounded-[2rem] border border-slate-200/80 bg-slate-950 px-6 py-5 text-white">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Workspace pulse</p>
+                <p className="mt-2 text-lg font-medium text-white">
+                  {pendingInvitations.length
+                    ? `${pendingInvitations.length} invite${pendingInvitations.length > 1 ? "s" : ""} waiting on you`
+                    : "No pending invites right now"}
+                </p>
+              </div>
+              <div className="rounded-full bg-white/10 px-4 py-2 text-sm text-slate-200">
+                Accent {activeWorkspace?.accentColor || "#2745f2"}
+              </div>
+            </div>
+          </div>
+
           {showCreateForm ? (
             <form
-              className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200 bg-slate-50 p-6"
+              className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200/80 bg-white/84 p-6"
               onSubmit={handleCreateWorkspace}
             >
               <label className="block">
@@ -148,12 +164,13 @@ export default function DashboardPage() {
           ) : null}
         </article>
 
-        <article className="rounded-[2rem] bg-slate-950 p-8 text-white shadow-soft">
-          <h2 className="text-lg font-semibold">Pending invitations</h2>
+        <article className="rounded-[2.3rem] border border-slate-900/10 bg-slate-950 p-8 text-white shadow-float">
+          <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Inbox</p>
+          <h2 className="mt-3 font-display text-3xl text-white">Pending invitations</h2>
           <div className="mt-6 space-y-4">
             {pendingInvitations.length ? (
               pendingInvitations.map((invitation) => (
-                <div key={invitation.id} className="rounded-3xl bg-white/10 p-4">
+                <div key={invitation.id} className="rounded-[1.8rem] border border-white/10 bg-white/10 p-5">
                   <p className="text-sm font-medium">{invitation.workspaceName}</p>
                   <p className="mt-2 text-sm text-slate-200">
                     Join as {invitation.role.toLowerCase()}.
