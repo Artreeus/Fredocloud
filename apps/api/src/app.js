@@ -1,5 +1,7 @@
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const express = require("express");
+const { authRouter } = require("./routes/auth.routes");
 
 const app = express();
 
@@ -9,6 +11,7 @@ app.use(
     credentials: true
   })
 );
+app.use(cookieParser());
 app.use(express.json());
 
 app.get("/api/health", (req, res) => {
@@ -16,6 +19,26 @@ app.get("/api/health", (req, res) => {
     status: "ok",
     service: "fredocloud-api",
     timestamp: new Date().toISOString()
+  });
+});
+
+app.use("/api/auth", authRouter);
+
+app.use((req, res) => {
+  res.status(404).json({
+    message: "Route not found"
+  });
+});
+
+app.use((error, req, res, next) => {
+  console.error(error);
+
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  return res.status(error.statusCode || 500).json({
+    message: error.message || "Internal server error"
   });
 });
 
