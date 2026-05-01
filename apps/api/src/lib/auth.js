@@ -93,7 +93,10 @@ function buildPublicUser(user) {
       role: membership.role,
       workspaceId: membership.workspaceId,
       workspaceName: membership.workspace?.name,
-      workspaceSlug: membership.workspace?.slug
+      workspaceSlug: membership.workspace?.slug,
+      workspaceDescription: membership.workspace?.description,
+      workspaceAccentColor: membership.workspace?.accentColor,
+      workspaceOwnerId: membership.workspace?.ownerId
     }))
   };
 }

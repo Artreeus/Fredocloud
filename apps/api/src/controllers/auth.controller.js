@@ -80,6 +80,7 @@ async function register(req, res, next) {
         data: {
           name: workspaceName,
           slug: workspaceSlug,
+          accentColor: "#2745f2",
           ownerId: createdUser.id
         }
       });
