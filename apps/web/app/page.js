@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-surface px-6 py-16 text-ink">
@@ -10,37 +12,23 @@ export default function HomePage() {
             Collaborative Team Hub
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-            Milestone 1 is in place with a Next.js frontend, Express API, shared packages,
-            Prisma schema skeleton, Tailwind theme tokens, and Turborepo orchestration.
+            Milestone 3 adds a full frontend authentication experience with route
+            protection, a Zustand auth store, profile management, and avatar upload wiring.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-600">
-            <span className="rounded-full bg-brand-50 px-4 py-2 text-brand-700">Next.js 14</span>
-            <span className="rounded-full bg-slate-100 px-4 py-2">Express API</span>
-            <span className="rounded-full bg-slate-100 px-4 py-2">Prisma ORM</span>
-            <span className="rounded-full bg-slate-100 px-4 py-2">Tailwind CSS</span>
-            <span className="rounded-full bg-slate-100 px-4 py-2">Turbo + pnpm</span>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/login"
+              className="rounded-full bg-brand-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-brand-700"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:border-brand-200 hover:text-brand-700"
+            >
+              Create account
+            </Link>
           </div>
-        </section>
-
-        <section className="grid gap-4 md:grid-cols-3">
-          <article className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-200">
-            <h2 className="text-lg font-semibold text-slate-950">Apps</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              Separate `web` and `api` applications with independent scripts and build outputs.
-            </p>
-          </article>
-          <article className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-200">
-            <h2 className="text-lg font-semibold text-slate-950">Shared Config</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              Reusable ESLint and Prettier configuration packaged for the entire monorepo.
-            </p>
-          </article>
-          <article className="rounded-3xl bg-white p-6 shadow-soft ring-1 ring-slate-200">
-            <h2 className="text-lg font-semibold text-slate-950">Ready For Next Steps</h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">
-              The structure is prepared for auth, collaboration, realtime, and file workflows.
-            </p>
-          </article>
         </section>
       </div>
     </main>
