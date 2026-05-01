@@ -41,13 +41,16 @@ export function TopNav() {
   }
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+    <header className="sticky top-0 z-20 px-4 pt-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-[1.8rem] border border-white/60 bg-white/72 px-5 py-4 shadow-soft backdrop-blur-xl">
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="text-lg font-semibold tracking-tight text-slate-950">
-            FredoCloud
+          <Link href="/dashboard" className="flex flex-col leading-none">
+            <span className="font-display text-xl text-slate-950">FredoCloud</span>
+            <span className="mt-1 text-[10px] uppercase tracking-[0.32em] text-slate-500">
+              Team Hub
+            </span>
           </Link>
-          <nav className="hidden items-center gap-2 md:flex">
+          <nav className="hidden items-center gap-2 xl:flex">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -55,7 +58,9 @@ export function TopNav() {
                   key={item.href}
                   href={item.href}
                   className={`rounded-full px-4 py-2 text-sm transition ${
-                    isActive ? "text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                    isActive
+                      ? "text-white shadow-sm"
+                      : "text-slate-600 hover:bg-white hover:text-slate-950"
                   }`}
                   style={isActive ? { backgroundColor: activeWorkspace?.accentColor || "#2745f2" } : {}}
                 >
@@ -67,7 +72,7 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 sm:flex">
+          <div className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-3 py-2 text-sm text-slate-600 lg:flex">
             <span
               className="h-3 w-3 rounded-full"
               style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
@@ -75,7 +80,7 @@ export function TopNav() {
             <select
               value={activeWorkspace?.id || ""}
               onChange={(event) => setActiveWorkspace(event.target.value)}
-              className="bg-transparent outline-none"
+              className="max-w-44 bg-transparent outline-none"
             >
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
@@ -86,7 +91,7 @@ export function TopNav() {
           </div>
           <Link
             href="/settings/profile"
-            className="flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-2 shadow-sm"
+            className="flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/88 px-2 py-2 shadow-sm"
           >
             {user?.avatarUrl ? (
               // eslint-disable-next-line @next/next/no-img-element

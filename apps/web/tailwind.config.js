@@ -9,30 +9,36 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        canvas: "#f4efe6",
+        midnight: "#10212b",
+        terracotta: "#c96f4a",
+        moss: "#58715d",
         brand: {
-          50: "#f5f8ff",
-          100: "#e8efff",
-          200: "#cad8ff",
-          300: "#9fb7ff",
-          400: "#6f8dff",
-          500: "#4766ff",
-          600: "#2745f2",
-          700: "#1d35c4",
-          800: "#1d3098",
-          900: "#1e3178"
+          50: "#f7f1ea",
+          100: "#f2e4d5",
+          200: "#e8c9aa",
+          300: "#dca175",
+          400: "#cd7b53",
+          500: "#bc5f3f",
+          600: "#a64a31",
+          700: "#863b29",
+          800: "#6c3226",
+          900: "#592c23"
         },
-        ink: "#0f172a",
-        surface: "#f8fafc"
+        ink: "#10212b",
+        surface: "#fbf7f1"
       },
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "sans-serif"]
+        sans: ["Avenir Next", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+        display: ["Iowan Old Style", "Palatino Linotype", "Book Antiqua", "Georgia", "serif"]
       },
       spacing: {
         18: "4.5rem",
         26: "6.5rem"
       },
       boxShadow: {
-        soft: "0 20px 45px -25px rgba(15, 23, 42, 0.35)"
+        soft: "0 25px 60px -28px rgba(16, 33, 43, 0.32)",
+        float: "0 30px 80px -34px rgba(16, 33, 43, 0.28)"
       }
     }
   },
