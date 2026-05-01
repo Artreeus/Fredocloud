@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ProtectedLayout } from "@/components/protected-layout";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const accentOptions = ["#2745f2", "#0f766e", "#dc2626", "#7c3aed", "#ea580c"];
@@ -12,22 +13,29 @@ export default function DashboardPage() {
   const pendingInvitations = useWorkspaceStore((state) => state.pendingInvitations);
   const loading = useWorkspaceStore((state) => state.loading);
   const error = useWorkspaceStore((state) => state.error);
+  const clearError = useWorkspaceStore((state) => state.clearError);
   const createWorkspace = useWorkspaceStore((state) => state.createWorkspace);
   const acceptInvitation = useWorkspaceStore((state) => state.acceptInvitation);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  const [success, setSuccess] = useState("");
+  const pushToast = useToastStore((state) => state.pushToast);
   const [form, setForm] = useState({
     name: "",
     description: "",
     accentColor: "#2745f2"
   });
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   async function handleCreateWorkspace(event) {
     event.preventDefault();
-    setSuccess("");
 
     await createWorkspace(form);
-    setSuccess("Workspace created and activated.");
+    pushToast({ type: "success", message: "Workspace created and activated." });
     setShowCreateForm(false);
     setForm({
       name: "",
@@ -37,9 +45,8 @@ export default function DashboardPage() {
   }
 
   async function handleAcceptInvitation(inviteId) {
-    setSuccess("");
     await acceptInvitation(inviteId);
-    setSuccess("Invitation accepted. Your workspace list has been updated.");
+    pushToast({ type: "success", message: "Invitation accepted. Your workspace list has been updated." });
   }
 
   return (
@@ -130,9 +137,6 @@ export default function DashboardPage() {
                   ))}
                 </div>
               </div>
-              {error ? (
-                <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-              ) : null}
               <button
                 type="submit"
                 disabled={loading}
@@ -141,12 +145,6 @@ export default function DashboardPage() {
                 {loading ? "Creating..." : "Create workspace"}
               </button>
             </form>
-          ) : null}
-
-          {success ? (
-            <p className="mt-6 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              {success}
-            </p>
           ) : null}
         </article>
 

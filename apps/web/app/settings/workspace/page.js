@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { hasPermission } from "@/lib/permissions";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useAuthStore } from "@/stores/auth-store";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const roleOptions = ["ADMIN", "MEMBER"];
@@ -30,12 +31,13 @@ export default function WorkspaceSettingsPage() {
   const rolePermissions = useWorkspaceStore((state) => state.rolePermissions);
   const loading = useWorkspaceStore((state) => state.loading);
   const error = useWorkspaceStore((state) => state.error);
+  const clearError = useWorkspaceStore((state) => state.clearError);
   const updateWorkspace = useWorkspaceStore((state) => state.updateWorkspace);
   const inviteMember = useWorkspaceStore((state) => state.inviteMember);
   const updateMemberRole = useWorkspaceStore((state) => state.updateMemberRole);
   const removeMember = useWorkspaceStore((state) => state.removeMember);
   const updateRolePermissions = useWorkspaceStore((state) => state.updateRolePermissions);
-  const [success, setSuccess] = useState("");
+  const pushToast = useToastStore((state) => state.pushToast);
   const [workspaceForm, setWorkspaceForm] = useState({
     name: "",
     description: "",
@@ -56,44 +58,45 @@ export default function WorkspaceSettingsPage() {
     }
   }, [activeWorkspace]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   const canManageWorkspace = hasPermission(activeWorkspace, "MANAGE_WORKSPACE");
   const canInviteMembers = hasPermission(activeWorkspace, "INVITE_MEMBER");
   const canManageMembers = hasPermission(activeWorkspace, "MANAGE_MEMBERS");
 
   async function handleWorkspaceSubmit(event) {
     event.preventDefault();
-    setSuccess("");
 
     await updateWorkspace(activeWorkspace.id, workspaceForm);
-    setSuccess("Workspace settings updated.");
+    pushToast({ type: "success", message: "Workspace settings updated." });
   }
 
   async function handleInvite(event) {
     event.preventDefault();
-    setSuccess("");
-
     await inviteMember(activeWorkspace.id, inviteForm);
     setInviteForm({
       email: "",
       role: "MEMBER"
     });
-    setSuccess("Invitation created.");
+    pushToast({ type: "success", message: "Invitation created." });
   }
 
   async function handleRoleChange(memberId, role) {
-    setSuccess("");
     await updateMemberRole(activeWorkspace.id, memberId, role);
-    setSuccess("Member role updated.");
+    pushToast({ type: "success", message: "Member role updated." });
   }
 
   async function handleRemove(memberId) {
-    setSuccess("");
     await removeMember(activeWorkspace.id, memberId);
-    setSuccess("Member removed.");
+    pushToast({ type: "success", message: "Member removed." });
   }
 
   async function handlePermissionToggle(role, permission, enabled) {
-    setSuccess("");
     const currentRolePermissions =
       rolePermissions.find((entry) => entry.role === role)?.permissions || [];
     const nextPermissions = enabled
@@ -109,7 +112,7 @@ export default function WorkspaceSettingsPage() {
         ];
 
     await updateRolePermissions(activeWorkspace.id, role, nextPermissions);
-    setSuccess(`${role} permissions updated.`);
+    pushToast({ type: "success", message: `${role} permissions updated.` });
   }
 
   return (
@@ -166,14 +169,6 @@ export default function WorkspaceSettingsPage() {
             {!canManageWorkspace ? (
               <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
                 Your current role can view workspace settings, but not edit them.
-              </p>
-            ) : null}
-            {error ? (
-              <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-            ) : null}
-            {success ? (
-              <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {success}
               </p>
             ) : null}
             <button

@@ -34,6 +34,7 @@ export const useActionItemStore = create((set, get) => ({
   pendingStatusIds: {},
   loading: false,
   error: null,
+  clearError: () => set({ error: null }),
   setViewMode: (viewMode) => set({ viewMode }),
   setFilters: (nextFilters) =>
     set((state) => ({

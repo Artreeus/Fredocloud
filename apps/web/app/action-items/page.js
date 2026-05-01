@@ -7,6 +7,7 @@ import { ActionItemFormModal } from "@/components/action-item-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useActionItemStore } from "@/stores/action-item-store";
 import { useGoalStore } from "@/stores/goal-store";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const columns = [
@@ -123,6 +124,7 @@ export default function ActionItemsPage() {
   const pendingStatusIds = useActionItemStore((state) => state.pendingStatusIds);
   const loading = useActionItemStore((state) => state.loading);
   const error = useActionItemStore((state) => state.error);
+  const clearError = useActionItemStore((state) => state.clearError);
   const setViewMode = useActionItemStore((state) => state.setViewMode);
   const setFilters = useActionItemStore((state) => state.setFilters);
   const fetchActionItems = useActionItemStore((state) => state.fetchActionItems);
@@ -135,6 +137,7 @@ export default function ActionItemsPage() {
   const clearSelection = useActionItemStore((state) => state.clearSelection);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingActionItem, setEditingActionItem] = useState(null);
+  const pushToast = useToastStore((state) => state.pushToast);
   const canCreateActionItem = hasPermission(activeWorkspace, "CREATE_ACTION_ITEM");
   const canUpdateActionItem = hasPermission(activeWorkspace, "UPDATE_ACTION_ITEM");
   const canDeleteContent = hasPermission(activeWorkspace, "DELETE_CONTENT");
@@ -157,6 +160,13 @@ export default function ActionItemsPage() {
     fetchActionItems(activeWorkspace.id).catch(() => {});
   }, [activeWorkspace?.id, fetchActionItems, fetchGoals, filters]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   async function refreshBoard() {
     await fetchActionItems(activeWorkspace.id);
   }
@@ -167,18 +177,21 @@ export default function ActionItemsPage() {
       workspaceId: activeWorkspace.id
     });
     setShowCreateModal(false);
+    pushToast({ type: "success", message: "Action item created." });
     await refreshBoard();
   }
 
   async function handleUpdateActionItem(values) {
     await updateActionItem(editingActionItem.id, values);
     setEditingActionItem(null);
+    pushToast({ type: "success", message: "Action item updated." });
     await refreshBoard();
   }
 
   async function handleDeleteActionItem() {
     await deleteActionItem(editingActionItem.id);
     setEditingActionItem(null);
+    pushToast({ type: "success", message: "Action item deleted." });
     await refreshBoard();
   }
 
@@ -193,6 +206,7 @@ export default function ActionItemsPage() {
 
   async function handleBulkStatusChange(status) {
     await bulkUpdateStatus(activeWorkspace.id, status);
+    pushToast({ type: "success", message: "Bulk status update applied." });
     await refreshBoard();
   }
 
@@ -345,10 +359,6 @@ export default function ActionItemsPage() {
             <span className="text-sm text-slate-700">Show overdue items only</span>
           </label>
         </section>
-
-        {error ? (
-          <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-        ) : null}
 
         {viewMode === "kanban" ? (
           <DragDropContext onDragEnd={canUpdateActionItem ? handleDragEnd : () => {}}>

@@ -5,6 +5,7 @@ import { CommentThread } from "@/components/comment-thread";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { ReactionBar } from "@/components/reaction-bar";
 import { useAnnouncementStore } from "@/stores/announcement-store";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function AnnouncementDetailPage({ params }) {
@@ -13,10 +14,12 @@ export default function AnnouncementDetailPage({ params }) {
   const comments = useAnnouncementStore((state) => state.comments);
   const loading = useAnnouncementStore((state) => state.loading);
   const error = useAnnouncementStore((state) => state.error);
+  const clearError = useAnnouncementStore((state) => state.clearError);
   const fetchAnnouncement = useAnnouncementStore((state) => state.fetchAnnouncement);
   const addComment = useAnnouncementStore((state) => state.addComment);
   const toggleReaction = useAnnouncementStore((state) => state.toggleReaction);
   const [commentBody, setCommentBody] = useState("");
+  const pushToast = useToastStore((state) => state.pushToast);
 
   useEffect(() => {
     if (params?.id) {
@@ -24,11 +27,19 @@ export default function AnnouncementDetailPage({ params }) {
     }
   }, [fetchAnnouncement, params?.id]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   async function handleAddComment(event) {
     event.preventDefault();
     await addComment(params.id, { body: commentBody });
     await fetchAnnouncement(params.id);
     setCommentBody("");
+    pushToast({ type: "success", message: "Comment posted." });
   }
 
   async function handleReply(parentCommentId, body) {
@@ -115,9 +126,6 @@ export default function AnnouncementDetailPage({ params }) {
         </div>
       )}
 
-      {error ? (
-        <p className="mt-6 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-      ) : null}
     </ProtectedLayout>
   );
 }

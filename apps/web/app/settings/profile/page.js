@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useAuthStore } from "@/stores/auth-store";
+import { useToastStore } from "@/stores/toast-store";
 
 export default function ProfilePage() {
   const user = useAuthStore((state) => state.user);
   const loading = useAuthStore((state) => state.loading);
   const error = useAuthStore((state) => state.error);
+  const clearError = useAuthStore((state) => state.clearError);
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const uploadAvatar = useAuthStore((state) => state.uploadAvatar);
   const [name, setName] = useState("");
-  const [success, setSuccess] = useState("");
+  const pushToast = useToastStore((state) => state.pushToast);
 
   useEffect(() => {
     if (user?.name) {
@@ -19,12 +21,18 @@ export default function ProfilePage() {
     }
   }, [user?.name]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   async function handleProfileSubmit(event) {
     event.preventDefault();
-    setSuccess("");
 
     await updateProfile({ name });
-    setSuccess("Profile updated.");
+    pushToast({ type: "success", message: "Profile updated." });
   }
 
   async function handleFileChange(event) {
@@ -34,9 +42,8 @@ export default function ProfilePage() {
       return;
     }
 
-    setSuccess("");
     await uploadAvatar(file);
-    setSuccess("Avatar updated.");
+    pushToast({ type: "success", message: "Avatar updated." });
     event.target.value = "";
   }
 
@@ -76,15 +83,6 @@ export default function ProfilePage() {
                 <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
               </label>
             </div>
-
-            {error ? (
-              <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-            ) : null}
-            {success ? (
-              <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {success}
-              </p>
-            ) : null}
 
             <button
               type="submit"

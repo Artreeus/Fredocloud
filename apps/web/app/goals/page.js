@@ -6,6 +6,7 @@ import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useGoalStore } from "@/stores/goal-store";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 function formatDate(value) {
@@ -22,8 +23,10 @@ export default function GoalsPage() {
   const goals = useGoalStore((state) => state.goals);
   const loading = useGoalStore((state) => state.loading);
   const error = useGoalStore((state) => state.error);
+  const clearError = useGoalStore((state) => state.clearError);
   const fetchGoals = useGoalStore((state) => state.fetchGoals);
   const createGoal = useGoalStore((state) => state.createGoal);
+  const pushToast = useToastStore((state) => state.pushToast);
   const [filters, setFilters] = useState({
     status: "",
     assigneeId: "",
@@ -45,6 +48,13 @@ export default function GoalsPage() {
     }).catch(() => {});
   }, [activeWorkspace?.id, fetchGoals, filters.assigneeId, filters.search, filters.status]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   const now = useMemo(() => new Date(), []);
 
   async function handleCreateGoal(values) {
@@ -55,6 +65,7 @@ export default function GoalsPage() {
       workspaceId: activeWorkspace.id,
       dueDate: values.dueDate || null
     });
+    pushToast({ type: "success", message: "Goal created." });
   }
 
   return (
@@ -131,10 +142,6 @@ export default function GoalsPage() {
             />
           </label>
         </section>
-
-        {error ? (
-          <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-        ) : null}
 
         <section className="grid gap-5">
           {goals.map((goal) => {

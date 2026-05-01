@@ -5,6 +5,7 @@ import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useGoalStore } from "@/stores/goal-store";
+import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 function formatDate(value) {
@@ -21,6 +22,7 @@ export default function GoalDetailPage({ params }) {
   const goal = useGoalStore((state) => state.currentGoal);
   const loading = useGoalStore((state) => state.loading);
   const error = useGoalStore((state) => state.error);
+  const clearError = useGoalStore((state) => state.clearError);
   const fetchGoal = useGoalStore((state) => state.fetchGoal);
   const updateGoal = useGoalStore((state) => state.updateGoal);
   const addMilestone = useGoalStore((state) => state.addMilestone);
@@ -32,8 +34,8 @@ export default function GoalDetailPage({ params }) {
     progress: 0
   });
   const [updateText, setUpdateText] = useState("");
-  const [success, setSuccess] = useState("");
   const canUpdateGoal = hasPermission(activeWorkspace, "UPDATE_GOAL");
+  const pushToast = useToastStore((state) => state.pushToast);
 
   useEffect(() => {
     if (params?.id) {
@@ -41,35 +43,39 @@ export default function GoalDetailPage({ params }) {
     }
   }, [fetchGoal, params?.id]);
 
+  useEffect(() => {
+    if (error) {
+      pushToast({ type: "error", message: error });
+      clearError();
+    }
+  }, [clearError, error, pushToast]);
+
   async function handleEditGoal(values) {
     await updateGoal(goal.id, values);
     setShowEditModal(false);
-    setSuccess("Goal updated.");
+    pushToast({ type: "success", message: "Goal updated." });
   }
 
   async function handleAddMilestone(event) {
     event.preventDefault();
-    setSuccess("");
     await addMilestone(goal.id, milestoneForm);
     setMilestoneForm({
       title: "",
       progress: 0
     });
-    setSuccess("Milestone added.");
+    pushToast({ type: "success", message: "Milestone added." });
   }
 
   async function handlePostUpdate(event) {
     event.preventDefault();
-    setSuccess("");
     await addUpdate(goal.id, updateText);
     setUpdateText("");
-    setSuccess("Progress update posted.");
+    pushToast({ type: "success", message: "Progress update posted." });
   }
 
   async function handleMilestoneProgressChange(milestoneId, progress) {
-    setSuccess("");
     await updateMilestone(goal.id, milestoneId, { progress: Number(progress) });
-    setSuccess("Milestone progress updated.");
+    pushToast({ type: "success", message: "Milestone progress updated." });
   }
 
   return (
@@ -272,15 +278,6 @@ export default function GoalDetailPage({ params }) {
                 ) : null}
               </div>
             </section>
-
-            {success ? (
-              <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {success}
-              </p>
-            ) : null}
-            {error ? (
-              <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
-            ) : null}
           </article>
         </section>
       ) : (
