@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const accessCookieName =
   process.env.ACCESS_TOKEN_COOKIE_NAME || "fredocloud_access_token";
 
-const protectedPrefixes = ["/dashboard", "/settings", "/goals", "/announcements"];
+const protectedPrefixes = ["/dashboard", "/settings", "/goals", "/action-items", "/announcements"];
 const guestOnlyPrefixes = ["/login", "/register"];
 
 export function middleware(request) {
@@ -31,6 +31,7 @@ export const config = {
     "/dashboard/:path*",
     "/settings/:path*",
     "/goals/:path*",
+    "/action-items/:path*",
     "/announcements/:path*",
     "/login",
     "/register"

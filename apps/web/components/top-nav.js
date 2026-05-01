@@ -8,6 +8,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/goals", label: "Goals" },
+  { href: "/action-items", label: "Action Items" },
   { href: "/announcements", label: "Announcements" },
   { href: "/settings/profile", label: "Profile" },
   { href: "/settings/workspace", label: "Workspace" }
