@@ -1,4 +1,5 @@
-const { ActionItemStatus, AuditAction, NotificationType } = require("../../generated/prisma");
+const { ActionItemStatus, AuditAction, NotificationType, Permission } = require("../../generated/prisma");
+const { assertWorkspacePermission } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 
@@ -199,7 +200,7 @@ async function createActionItem(req, res, next) {
       throw createError("workspaceId and title are required", 400);
     }
 
-    await getWorkspaceMembershipOrThrow(workspaceId, req.user.id);
+    await assertWorkspacePermission(workspaceId, req.user.id, Permission.CREATE_ACTION_ITEM);
     const goal = await validateGoalAccess(workspaceId, goalId, req.user.id);
     const normalizedStatus = normalizeStatus(status) || ActionItemStatus.OPEN;
 
@@ -264,6 +265,11 @@ async function createActionItem(req, res, next) {
 async function updateActionItem(req, res, next) {
   try {
     const existingActionItem = await getActionItemOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(
+      existingActionItem.workspaceId,
+      req.user.id,
+      Permission.UPDATE_ACTION_ITEM
+    );
     const { title, description, assigneeId, priority, dueDate, goalId, status } = req.body;
     const normalizedStatus = status !== undefined ? normalizeStatus(status) : undefined;
 
@@ -314,6 +320,11 @@ async function updateActionItem(req, res, next) {
 async function updateActionItemStatus(req, res, next) {
   try {
     const existingActionItem = await getActionItemOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(
+      existingActionItem.workspaceId,
+      req.user.id,
+      Permission.UPDATE_ACTION_ITEM
+    );
     const normalizedStatus = normalizeStatus(req.body.status);
 
     if (!normalizedStatus) {
@@ -356,7 +367,7 @@ async function bulkUpdateActionItemStatus(req, res, next) {
       throw createError("workspaceId and actionItemIds are required", 400);
     }
 
-    await getWorkspaceMembershipOrThrow(workspaceId, req.user.id);
+    await assertWorkspacePermission(workspaceId, req.user.id, Permission.UPDATE_ACTION_ITEM);
 
     const normalizedStatus = normalizeStatus(status);
 
@@ -408,7 +419,8 @@ async function bulkUpdateActionItemStatus(req, res, next) {
 
 async function deleteActionItem(req, res, next) {
   try {
-    await getActionItemOrThrow(req.params.id, req.user.id);
+    const actionItem = await getActionItemOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(actionItem.workspaceId, req.user.id, Permission.DELETE_CONTENT);
 
     await prisma.actionItem.delete({
       where: { id: req.params.id }

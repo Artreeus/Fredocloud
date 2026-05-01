@@ -62,6 +62,19 @@ enum ActionItemStatus {
   DONE
 }
 
+enum Permission {
+  CREATE_GOAL
+  UPDATE_GOAL
+  POST_ANNOUNCEMENT
+  PIN_ANNOUNCEMENT
+  INVITE_MEMBER
+  MANAGE_MEMBERS
+  CREATE_ACTION_ITEM
+  UPDATE_ACTION_ITEM
+  DELETE_CONTENT
+  MANAGE_WORKSPACE
+}
+
 enum AuditAction {
   USER_REGISTERED
   USER_LOGGED_IN
@@ -120,6 +133,7 @@ model Workspace {
   auditLogs     AuditLog[]
   comments      Comment[]
   reactions     Reaction[]
+  rolePermissions WorkspaceRolePermission[]
 }
 
 model WorkspaceMember {
@@ -134,6 +148,20 @@ model WorkspaceMember {
   workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@unique([userId, workspaceId])
+  @@index([workspaceId, role])
+}
+
+model WorkspaceRolePermission {
+  id          String        @id @default(cuid())
+  workspaceId String
+  role        WorkspaceRole
+  permission  Permission
+  enabled     Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, role, permission])
   @@index([workspaceId, role])
 }
 

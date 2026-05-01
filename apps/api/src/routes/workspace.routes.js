@@ -6,9 +6,11 @@ const {
   inviteWorkspaceMember,
   listMyInvitations,
   listWorkspaceMembers,
+  listWorkspacePermissions,
   listWorkspaces,
   removeWorkspaceMember,
   updateWorkspace,
+  updateWorkspacePermissions,
   updateWorkspaceMemberRole
 } = require("../controllers/workspace.controller");
 const { requireAuth } = require("../middleware/auth.middleware");
@@ -25,6 +27,8 @@ workspaceRouter.patch("/:id", updateWorkspace);
 workspaceRouter.delete("/:id", deleteWorkspace);
 workspaceRouter.post("/:id/invite", inviteWorkspaceMember);
 workspaceRouter.get("/:id/members", listWorkspaceMembers);
+workspaceRouter.get("/:id/permissions", listWorkspacePermissions);
+workspaceRouter.patch("/:id/permissions/:role", updateWorkspacePermissions);
 workspaceRouter.patch("/:id/members/:userId/role", updateWorkspaceMemberRole);
 workspaceRouter.delete("/:id/members/:userId", removeWorkspaceMember);
 

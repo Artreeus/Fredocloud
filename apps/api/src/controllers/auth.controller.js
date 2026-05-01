@@ -12,6 +12,7 @@ const {
   signRefreshToken,
   verifyRefreshToken
 } = require("../lib/auth");
+const { syncWorkspaceRolePermissions } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 
 function createError(message, statusCode) {
@@ -34,12 +35,27 @@ async function persistRefreshToken(userId, refreshToken) {
 }
 
 async function fetchUserProfile(userId) {
+  const memberships = await prisma.workspaceMember.findMany({
+    where: { userId },
+    select: { workspaceId: true }
+  });
+
+  await Promise.all(
+    [...new Set(memberships.map((membership) => membership.workspaceId))].map((workspaceId) =>
+      syncWorkspaceRolePermissions(prisma, workspaceId)
+    )
+  );
+
   return prisma.user.findUnique({
     where: { id: userId },
     include: {
       workspaceMemberships: {
         include: {
-          workspace: true
+          workspace: {
+            include: {
+              rolePermissions: true
+            }
+          }
         }
       }
     }
@@ -92,6 +108,8 @@ async function register(req, res, next) {
           role: WorkspaceRole.OWNER
         }
       });
+
+      await syncWorkspaceRolePermissions(tx, workspace.id);
 
       await tx.auditLog.create({
         data: {
@@ -310,7 +328,11 @@ async function updateMe(req, res, next) {
       include: {
         workspaceMemberships: {
           include: {
-            workspace: true
+            workspace: {
+              include: {
+                rolePermissions: true
+              }
+            }
           }
         }
       }

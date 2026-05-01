@@ -91,6 +91,10 @@ function buildPublicUser(user) {
     memberships: user.workspaceMemberships?.map((membership) => ({
       id: membership.id,
       role: membership.role,
+      permissions:
+        membership.workspace?.rolePermissions
+          ?.filter((entry) => entry.role === membership.role && entry.enabled)
+          .map((entry) => entry.permission) || [],
       workspaceId: membership.workspaceId,
       workspaceName: membership.workspace?.name,
       workspaceSlug: membership.workspace?.slug,

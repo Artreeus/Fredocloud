@@ -1,8 +1,14 @@
 const crypto = require("crypto");
-const { AuditAction, InvitationStatus, NotificationType, WorkspaceRole } = require("../../generated/prisma");
+const { AuditAction, InvitationStatus, NotificationType, Permission, WorkspaceRole } = require("../../generated/prisma");
 const { slugify } = require("@repo/utils");
 const { prisma } = require("../lib/prisma");
-const { canManageWorkspace, createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
+const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
+const {
+  assertWorkspacePermission,
+  getPermissionsForRole,
+  getWorkspacePermissionsOrThrow,
+  syncWorkspaceRolePermissions
+} = require("../lib/permissions");
 
 function validateAccentColor(value) {
   return /^#[0-9A-Fa-f]{6}$/.test(value);
@@ -44,21 +50,33 @@ function serializeWorkspace(workspace, membership) {
     createdAt: workspace.createdAt,
     updatedAt: workspace.updatedAt,
     role: membership?.role,
+    permissions:
+      membership && workspace.rolePermissions
+        ? getPermissionsForRole(workspace.rolePermissions, membership.role)
+        : [],
     memberCount: workspace._count?.members ?? workspace.members?.length ?? 0
   };
 }
 
-function canManageRoles(membership) {
-  return canManageWorkspace(membership);
-}
-
 async function listWorkspaces(req, res, next) {
   try {
+    const existingMemberships = await prisma.workspaceMember.findMany({
+      where: { userId: req.user.id },
+      select: { workspaceId: true }
+    });
+
+    await Promise.all(
+      [...new Set(existingMemberships.map((membership) => membership.workspaceId))].map((workspaceId) =>
+        syncWorkspaceRolePermissions(prisma, workspaceId)
+      )
+    );
+
     const memberships = await prisma.workspaceMember.findMany({
       where: { userId: req.user.id },
       include: {
         workspace: {
           include: {
+            rolePermissions: true,
             _count: {
               select: { members: true }
             }
@@ -121,9 +139,14 @@ async function createWorkspace(req, res, next) {
         }
       });
 
+      await syncWorkspaceRolePermissions(tx, createdWorkspace.id);
+
       return {
         ...createdWorkspace,
         _count: { members: 1 },
+        rolePermissions: await tx.workspaceRolePermission.findMany({
+          where: { workspaceId: createdWorkspace.id }
+        }),
         membership
       };
     });
@@ -139,11 +162,11 @@ async function createWorkspace(req, res, next) {
 
 async function updateWorkspace(req, res, next) {
   try {
-    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
-
-    if (!canManageWorkspace(membership)) {
-      throw createError("Only workspace admins can update workspace settings", 403);
-    }
+    const membership = await assertWorkspacePermission(
+      req.params.id,
+      req.user.id,
+      Permission.MANAGE_WORKSPACE
+    );
 
     const { name, description, accentColor } = req.body;
 
@@ -159,6 +182,7 @@ async function updateWorkspace(req, res, next) {
         ...(accentColor ? { accentColor } : {})
       },
       include: {
+        rolePermissions: true,
         _count: {
           select: { members: true }
         }
@@ -196,11 +220,7 @@ async function deleteWorkspace(req, res, next) {
 
 async function inviteWorkspaceMember(req, res, next) {
   try {
-    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
-
-    if (!canManageWorkspace(membership)) {
-      throw createError("Only workspace admins can invite members", 403);
-    }
+    await assertWorkspacePermission(req.params.id, req.user.id, Permission.INVITE_MEMBER);
 
     const { email, role } = req.body;
     const normalizedEmail = email?.toLowerCase();
@@ -326,11 +346,11 @@ async function listWorkspaceMembers(req, res, next) {
 
 async function updateWorkspaceMemberRole(req, res, next) {
   try {
-    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
-
-    if (!canManageRoles(membership)) {
-      throw createError("Only workspace admins can change roles", 403);
-    }
+    const membership = await assertWorkspacePermission(
+      req.params.id,
+      req.user.id,
+      Permission.MANAGE_MEMBERS
+    );
 
     const { role } = req.body;
 
@@ -381,11 +401,11 @@ async function updateWorkspaceMemberRole(req, res, next) {
 
 async function removeWorkspaceMember(req, res, next) {
   try {
-    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
-
-    if (!canManageWorkspace(membership)) {
-      throw createError("Only workspace admins can remove members", 403);
-    }
+    const membership = await assertWorkspacePermission(
+      req.params.id,
+      req.user.id,
+      Permission.MANAGE_MEMBERS
+    );
 
     if (req.params.userId === membership.workspace.ownerId) {
       throw createError("The workspace owner cannot be removed", 400);
@@ -539,12 +559,87 @@ async function acceptInvitation(req, res, next) {
         }
       });
 
+      await syncWorkspaceRolePermissions(tx, invite.workspaceId);
+
       return createdMembership;
     });
 
     return res.status(200).json({
       message: "Invitation accepted successfully",
       workspace: serializeWorkspace(invite.workspace, membership)
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function listWorkspacePermissions(req, res, next) {
+  try {
+    const permissions = await getWorkspacePermissionsOrThrow(req.params.id, req.user.id);
+
+    return res.status(200).json({
+      permissions
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function updateWorkspacePermissions(req, res, next) {
+  try {
+    await assertWorkspacePermission(req.params.id, req.user.id, Permission.MANAGE_MEMBERS);
+
+    const role = req.params.role;
+    const requestedPermissions = req.body.permissions || [];
+
+    if (![WorkspaceRole.ADMIN, WorkspaceRole.MEMBER].includes(role)) {
+      throw createError("Only Admin and Member permissions can be edited", 400);
+    }
+
+    const invalidPermission = requestedPermissions.find((permission) => !Permission[permission]);
+
+    if (invalidPermission) {
+      throw createError(`Invalid permission: ${invalidPermission}`, 400);
+    }
+
+    await syncWorkspaceRolePermissions(prisma, req.params.id);
+
+    await prisma.$transaction(async (tx) => {
+      await tx.workspaceRolePermission.updateMany({
+        where: {
+          workspaceId: req.params.id,
+          role
+        },
+        data: {
+          enabled: false
+        }
+      });
+
+      if (requestedPermissions.length) {
+        await Promise.all(
+          requestedPermissions.map((permission) =>
+            tx.workspaceRolePermission.update({
+              where: {
+                workspaceId_role_permission: {
+                  workspaceId: req.params.id,
+                  role,
+                  permission
+                }
+              },
+              data: {
+                enabled: true
+              }
+            })
+          )
+        );
+      }
+    });
+
+    const permissions = await getWorkspacePermissionsOrThrow(req.params.id, req.user.id);
+
+    return res.status(200).json({
+      message: "Workspace permissions updated successfully",
+      permissions
     });
   } catch (error) {
     return next(error);
@@ -558,8 +653,10 @@ module.exports = {
   inviteWorkspaceMember,
   listMyInvitations,
   listWorkspaceMembers,
+  listWorkspacePermissions,
   listWorkspaces,
   removeWorkspaceMember,
   updateWorkspace,
+  updateWorkspacePermissions,
   updateWorkspaceMemberRole
 };

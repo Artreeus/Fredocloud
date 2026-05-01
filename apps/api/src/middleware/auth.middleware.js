@@ -1,4 +1,5 @@
 const { getAccessTokenFromCookies, verifyAccessToken } = require("../lib/auth");
+const { syncWorkspaceRolePermissions } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 
 async function requireAuth(req, res, next) {
@@ -13,12 +14,27 @@ async function requireAuth(req, res, next) {
 
     const payload = verifyAccessToken(accessToken);
 
+    const memberships = await prisma.workspaceMember.findMany({
+      where: { userId: payload.sub },
+      select: { workspaceId: true }
+    });
+
+    await Promise.all(
+      [...new Set(memberships.map((membership) => membership.workspaceId))].map((workspaceId) =>
+        syncWorkspaceRolePermissions(prisma, workspaceId)
+      )
+    );
+
     const user = await prisma.user.findUnique({
       where: { id: payload.sub },
       include: {
         workspaceMemberships: {
           include: {
-            workspace: true
+            workspace: {
+              include: {
+                rolePermissions: true
+              }
+            }
           }
         }
       }

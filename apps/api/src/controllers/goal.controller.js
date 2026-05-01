@@ -1,5 +1,6 @@
-const { AuditAction, GoalStatus } = require("../../generated/prisma");
+const { AuditAction, GoalStatus, Permission } = require("../../generated/prisma");
 const { clampProgress, milestoneStatusFromProgress, syncGoalProgressAndStatus } = require("../lib/goals");
+const { assertWorkspacePermission } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 
 function createError(message, statusCode) {
@@ -196,7 +197,7 @@ async function createGoal(req, res, next) {
       throw createError("workspaceId and title are required", 400);
     }
 
-    await getWorkspaceMembershipOrThrow(workspaceId, req.user.id);
+    await assertWorkspacePermission(workspaceId, req.user.id, Permission.CREATE_GOAL);
 
     const createdGoal = await prisma.$transaction(async (tx) => {
       const goal = await tx.goal.create({
@@ -261,6 +262,7 @@ async function createGoal(req, res, next) {
 async function updateGoal(req, res, next) {
   try {
     const existingGoal = await getGoalOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(existingGoal.workspaceId, req.user.id, Permission.UPDATE_GOAL);
     const { title, description, assigneeId, dueDate, status, priority } = req.body;
 
     await prisma.goal.update({
@@ -295,7 +297,8 @@ async function updateGoal(req, res, next) {
 
 async function deleteGoal(req, res, next) {
   try {
-    await getGoalOrThrow(req.params.id, req.user.id);
+    const goal = await getGoalOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(goal.workspaceId, req.user.id, Permission.DELETE_CONTENT);
 
     await prisma.goal.delete({
       where: { id: req.params.id }
@@ -312,6 +315,7 @@ async function deleteGoal(req, res, next) {
 async function createMilestone(req, res, next) {
   try {
     const goal = await getGoalOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(goal.workspaceId, req.user.id, Permission.UPDATE_GOAL);
     const { title, description, progress, dueDate, ownerId } = req.body;
 
     if (!title) {
@@ -348,6 +352,7 @@ async function createMilestone(req, res, next) {
 async function updateMilestone(req, res, next) {
   try {
     const goal = await getGoalOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(goal.workspaceId, req.user.id, Permission.UPDATE_GOAL);
     const { title, description, progress, dueDate, ownerId } = req.body;
 
     const updatedMilestone = await prisma.$transaction(async (tx) => {
@@ -389,6 +394,7 @@ async function updateMilestone(req, res, next) {
 async function createGoalUpdate(req, res, next) {
   try {
     const goal = await getGoalOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(goal.workspaceId, req.user.id, Permission.UPDATE_GOAL);
     const { body } = req.body;
 
     if (!body) {

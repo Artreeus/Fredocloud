@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { slugify } = require("@repo/utils");
 const { AuditAction, PrismaClient, WorkspaceRole } = require("../generated/prisma");
+const { syncWorkspaceRolePermissions } = require("../src/lib/permissions");
 
 const prisma = new PrismaClient();
 
@@ -66,6 +67,14 @@ async function main() {
       }
     }
   });
+
+  const allWorkspaces = await prisma.workspace.findMany({
+    select: { id: true }
+  });
+
+  for (const existingWorkspace of allWorkspaces) {
+    await syncWorkspaceRolePermissions(prisma, existingWorkspace.id);
+  }
 
   const demoGoal = await prisma.goal.upsert({
     where: {

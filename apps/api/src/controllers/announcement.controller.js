@@ -1,5 +1,6 @@
-const { AuditAction, NotificationType, ReactionType } = require("../../generated/prisma");
-const { canManageWorkspace, createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
+const { AuditAction, NotificationType, Permission, ReactionType } = require("../../generated/prisma");
+const { assertWorkspacePermission } = require("../lib/permissions");
+const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
 
 const reactionLabels = {
@@ -119,11 +120,7 @@ async function createAnnouncement(req, res, next) {
       throw createError("workspaceId, title, and body are required", 400);
     }
 
-    const membership = await getWorkspaceMembershipOrThrow(workspaceId, req.user.id);
-
-    if (!canManageWorkspace(membership)) {
-      throw createError("Only admins can create announcements", 403);
-    }
+    await assertWorkspacePermission(workspaceId, req.user.id, Permission.POST_ANNOUNCEMENT);
 
     const announcement = await prisma.announcement.create({
       data: {
@@ -248,11 +245,8 @@ async function getAnnouncement(req, res, next) {
 
 async function pinAnnouncement(req, res, next) {
   try {
-    const { announcement, membership } = await getAnnouncementOrThrow(req.params.id, req.user.id);
-
-    if (!canManageWorkspace(membership)) {
-      throw createError("Only admins can pin announcements", 403);
-    }
+    const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(announcement.workspaceId, req.user.id, Permission.PIN_ANNOUNCEMENT);
 
     const updatedAnnouncement = await prisma.announcement.update({
       where: { id: announcement.id },
