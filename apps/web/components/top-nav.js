@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
+import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/settings/profile", label: "Profile" }
+  { href: "/settings/profile", label: "Profile" },
+  { href: "/settings/workspace", label: "Workspace" }
 ];
 
 function initials(name) {
@@ -24,13 +26,16 @@ export function TopNav() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const loading = useAuthStore((state) => state.loading);
+  const workspaces = useWorkspaceStore((state) => state.workspaces);
+  const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
+  const setActiveWorkspace = useWorkspaceStore((state) => state.setActiveWorkspace);
+  const resetWorkspaceStore = useWorkspaceStore((state) => state.reset);
 
   async function handleLogout() {
     await logout();
+    resetWorkspaceStore();
     router.push("/login");
   }
-
-  const activeWorkspace = user?.memberships?.[0];
 
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/85 backdrop-blur">
@@ -47,10 +52,9 @@ export function TopNav() {
                   key={item.href}
                   href={item.href}
                   className={`rounded-full px-4 py-2 text-sm transition ${
-                    isActive
-                      ? "bg-brand-600 text-white"
-                      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
+                    isActive ? "text-white" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"
                   }`}
+                  style={isActive ? { backgroundColor: activeWorkspace?.accentColor || "#2745f2" } : {}}
                 >
                   {item.label}
                 </Link>
@@ -60,8 +64,22 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="hidden rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600 sm:block">
-            Workspace: {activeWorkspace?.workspaceName || "Workspace switcher soon"}
+          <div className="hidden items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600 sm:flex">
+            <span
+              className="h-3 w-3 rounded-full"
+              style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+            />
+            <select
+              value={activeWorkspace?.id || ""}
+              onChange={(event) => setActiveWorkspace(event.target.value)}
+              className="bg-transparent outline-none"
+            >
+              {workspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.name}
+                </option>
+              ))}
+            </select>
           </div>
           <Link
             href="/settings/profile"
