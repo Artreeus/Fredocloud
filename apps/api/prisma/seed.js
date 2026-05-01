@@ -157,6 +157,64 @@ async function main() {
     skipDuplicates: true
   });
 
+  const seededActionItems = [
+    {
+      id: "demo-action-item-board",
+      title: "Review team dashboard copy",
+      description: "Tighten the dashboard messaging before the next internal demo.",
+      status: "OPEN",
+      priority: "HIGH",
+      dueDate: new Date("2026-05-06T00:00:00.000Z")
+    },
+    {
+      id: "demo-action-item-api",
+      title: "Wire action item filters",
+      description: "Support assignee, priority, status, goal, and overdue filters.",
+      status: "IN_PROGRESS",
+      priority: "URGENT",
+      dueDate: new Date("2026-05-03T00:00:00.000Z")
+    },
+    {
+      id: "demo-action-item-done",
+      title: "Confirm goal linkage",
+      description: "Make sure linked goal names are visible on task cards and rows.",
+      status: "DONE",
+      priority: "MEDIUM",
+      dueDate: new Date("2026-04-30T00:00:00.000Z")
+    }
+  ];
+
+  for (const actionItem of seededActionItems) {
+    await prisma.actionItem.upsert({
+      where: { id: actionItem.id },
+      update: {
+        workspaceId: workspace.id,
+        createdById: demoUser.id,
+        assigneeId: demoUser.id,
+        goalId: demoGoal.id,
+        title: actionItem.title,
+        description: actionItem.description,
+        priority: actionItem.priority,
+        status: actionItem.status,
+        dueDate: actionItem.dueDate,
+        completedAt: actionItem.status === "DONE" ? new Date("2026-04-29T00:00:00.000Z") : null
+      },
+      create: {
+        id: actionItem.id,
+        workspaceId: workspace.id,
+        createdById: demoUser.id,
+        assigneeId: demoUser.id,
+        goalId: demoGoal.id,
+        title: actionItem.title,
+        description: actionItem.description,
+        priority: actionItem.priority,
+        status: actionItem.status,
+        dueDate: actionItem.dueDate,
+        completedAt: actionItem.status === "DONE" ? new Date("2026-04-29T00:00:00.000Z") : null
+      }
+    });
+  }
+
   console.log("Seed complete");
   console.log(`Demo email: ${demoEmail}`);
   console.log(`Demo password: ${demoPassword}`);
