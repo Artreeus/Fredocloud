@@ -2,12 +2,7 @@ const crypto = require("crypto");
 const { AuditAction, InvitationStatus, NotificationType, WorkspaceRole } = require("../../generated/prisma");
 const { slugify } = require("@repo/utils");
 const { prisma } = require("../lib/prisma");
-
-function createError(message, statusCode) {
-  const error = new Error(message);
-  error.statusCode = statusCode;
-  return error;
-}
+const { canManageWorkspace, createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 
 function validateAccentColor(value) {
   return /^#[0-9A-Fa-f]{6}$/.test(value);
@@ -51,30 +46,6 @@ function serializeWorkspace(workspace, membership) {
     role: membership?.role,
     memberCount: workspace._count?.members ?? workspace.members?.length ?? 0
   };
-}
-
-async function getMembershipOrThrow(workspaceId, userId) {
-  const membership = await prisma.workspaceMember.findUnique({
-    where: {
-      userId_workspaceId: {
-        userId,
-        workspaceId
-      }
-    },
-    include: {
-      workspace: true
-    }
-  });
-
-  if (!membership) {
-    throw createError("Workspace not found", 404);
-  }
-
-  return membership;
-}
-
-function canManageWorkspace(membership) {
-  return [WorkspaceRole.OWNER, WorkspaceRole.ADMIN].includes(membership.role);
 }
 
 function canManageRoles(membership) {
@@ -168,7 +139,7 @@ async function createWorkspace(req, res, next) {
 
 async function updateWorkspace(req, res, next) {
   try {
-    const membership = await getMembershipOrThrow(req.params.id, req.user.id);
+    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     if (!canManageWorkspace(membership)) {
       throw createError("Only workspace admins can update workspace settings", 403);
@@ -205,7 +176,7 @@ async function updateWorkspace(req, res, next) {
 
 async function deleteWorkspace(req, res, next) {
   try {
-    const membership = await getMembershipOrThrow(req.params.id, req.user.id);
+    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     if (membership.role !== WorkspaceRole.OWNER) {
       throw createError("Only the workspace owner can delete this workspace", 403);
@@ -225,7 +196,7 @@ async function deleteWorkspace(req, res, next) {
 
 async function inviteWorkspaceMember(req, res, next) {
   try {
-    const membership = await getMembershipOrThrow(req.params.id, req.user.id);
+    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     if (!canManageWorkspace(membership)) {
       throw createError("Only workspace admins can invite members", 403);
@@ -318,7 +289,7 @@ async function inviteWorkspaceMember(req, res, next) {
 
 async function listWorkspaceMembers(req, res, next) {
   try {
-    await getMembershipOrThrow(req.params.id, req.user.id);
+    await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     const [members, invites] = await Promise.all([
       prisma.workspaceMember.findMany({
@@ -355,7 +326,7 @@ async function listWorkspaceMembers(req, res, next) {
 
 async function updateWorkspaceMemberRole(req, res, next) {
   try {
-    const membership = await getMembershipOrThrow(req.params.id, req.user.id);
+    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     if (!canManageRoles(membership)) {
       throw createError("Only workspace admins can change roles", 403);
@@ -410,7 +381,7 @@ async function updateWorkspaceMemberRole(req, res, next) {
 
 async function removeWorkspaceMember(req, res, next) {
   try {
-    const membership = await getMembershipOrThrow(req.params.id, req.user.id);
+    const membership = await getWorkspaceMembershipOrThrow(req.params.id, req.user.id);
 
     if (!canManageWorkspace(membership)) {
       throw createError("Only workspace admins can remove members", 403);
