@@ -1,6 +1,7 @@
 const { ActionItemStatus, AuditAction, NotificationType, Permission } = require("../../generated/prisma");
 const { assertWorkspacePermission } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
+const { emitWorkspaceEvent } = require("../lib/socket");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 
 function normalizeStatus(status) {
@@ -253,9 +254,15 @@ async function createActionItem(req, res, next) {
       });
     }
 
+    const serializedActionItem = serializeActionItem(actionItem);
+
+    emitWorkspaceEvent(workspaceId, "action-item:update", {
+      actionItem: serializedActionItem
+    });
+
     return res.status(201).json({
       message: "Action item created successfully",
-      actionItem: serializeActionItem(actionItem)
+      actionItem: serializedActionItem
     });
   } catch (error) {
     return next(error);
@@ -308,9 +315,15 @@ async function updateActionItem(req, res, next) {
       }
     });
 
+    const serializedActionItem = serializeActionItem(actionItem);
+
+    emitWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
+      actionItem: serializedActionItem
+    });
+
     return res.status(200).json({
       message: "Action item updated successfully",
-      actionItem: serializeActionItem(actionItem)
+      actionItem: serializedActionItem
     });
   } catch (error) {
     return next(error);
@@ -350,9 +363,15 @@ async function updateActionItemStatus(req, res, next) {
       }
     });
 
+    const serializedActionItem = serializeActionItem(actionItem);
+
+    emitWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
+      actionItem: serializedActionItem
+    });
+
     return res.status(200).json({
       message: "Action item status updated successfully",
-      actionItem: serializeActionItem(actionItem)
+      actionItem: serializedActionItem
     });
   } catch (error) {
     return next(error);

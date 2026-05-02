@@ -68,6 +68,30 @@ function applyReactionSummary(reactionSummary, type) {
   return nextSummary;
 }
 
+function insertComment(comments, nextComment, parentCommentId) {
+  if (!parentCommentId) {
+    return [...comments, nextComment];
+  }
+
+  return comments.map((comment) => {
+    if (comment.id === parentCommentId) {
+      return {
+        ...comment,
+        replies: [...(comment.replies || []), nextComment]
+      };
+    }
+
+    if (comment.replies?.length) {
+      return {
+        ...comment,
+        replies: insertComment(comment.replies, nextComment, parentCommentId)
+      };
+    }
+
+    return comment;
+  });
+}
+
 export const useAnnouncementStore = create((set, get) => ({
   announcements: [],
   currentAnnouncement: null,
@@ -77,6 +101,52 @@ export const useAnnouncementStore = create((set, get) => ({
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
+  applySocketAnnouncement: (announcement) =>
+    set((state) => {
+      const exists = state.announcements.some((entry) => entry.id === announcement.id);
+      const announcements = exists
+        ? state.announcements.map((entry) => (entry.id === announcement.id ? announcement : entry))
+        : [announcement, ...state.announcements];
+
+      return {
+        announcements: announcements.sort((a, b) => {
+          if (a.pinned !== b.pinned) {
+            return a.pinned ? -1 : 1;
+          }
+
+          return new Date(b.publishedAt || b.createdAt) - new Date(a.publishedAt || a.createdAt);
+        }),
+        currentAnnouncement:
+          state.currentAnnouncement?.id === announcement.id
+            ? {
+                ...state.currentAnnouncement,
+                ...announcement
+              }
+            : state.currentAnnouncement
+      };
+    }),
+  applySocketComment: ({ announcementId, comment, parentCommentId }) =>
+    set((state) => ({
+      comments:
+        state.currentAnnouncement?.id === announcementId
+          ? insertComment(state.comments, comment, parentCommentId)
+          : state.comments,
+      currentAnnouncement:
+        state.currentAnnouncement?.id === announcementId
+          ? {
+              ...state.currentAnnouncement,
+              commentCount: (state.currentAnnouncement.commentCount || 0) + 1
+            }
+          : state.currentAnnouncement,
+      announcements: state.announcements.map((announcement) =>
+        announcement.id === announcementId
+          ? {
+              ...announcement,
+              commentCount: (announcement.commentCount || 0) + 1
+            }
+          : announcement
+      )
+    })),
   fetchAnnouncements: async ({ workspaceId, page = 1, pageSize = 10 }) => {
     set({ loading: true, error: null });
 

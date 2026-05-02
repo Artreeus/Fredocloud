@@ -2,6 +2,7 @@ const { AuditAction, NotificationType, Permission, ReactionType } = require("../
 const { assertWorkspacePermission } = require("../lib/permissions");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
+const { emitWorkspaceEvent } = require("../lib/socket");
 
 const reactionLabels = {
   LIKE: { emoji: "👍", label: "Like" },
@@ -169,9 +170,15 @@ async function createAnnouncement(req, res, next) {
       }
     });
 
+    const serializedAnnouncement = serializeAnnouncement(announcement, req.user.id);
+
+    emitWorkspaceEvent(workspaceId, "announcement:new", {
+      announcement: serializedAnnouncement
+    });
+
     return res.status(201).json({
       message: "Announcement created successfully",
-      announcement: serializeAnnouncement(announcement, req.user.id)
+      announcement: serializedAnnouncement
     });
   } catch (error) {
     return next(error);
@@ -322,9 +329,15 @@ async function toggleReaction(req, res, next) {
       }
     });
 
+    const serializedAnnouncement = serializeAnnouncement(refreshed, req.user.id);
+
+    emitWorkspaceEvent(announcement.workspaceId, "reaction:update", {
+      announcement: serializedAnnouncement
+    });
+
     return res.status(200).json({
       message: "Reaction updated successfully",
-      announcement: serializeAnnouncement(refreshed, req.user.id)
+      announcement: serializedAnnouncement
     });
   } catch (error) {
     return next(error);
@@ -365,16 +378,24 @@ async function createComment(req, res, next) {
       }
     });
 
+    const serializedComment = {
+      id: comment.id,
+      body: comment.body,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      author: comment.author,
+      replies: []
+    };
+
+    emitWorkspaceEvent(announcement.workspaceId, "comment:new", {
+      announcementId: announcement.id,
+      comment: serializedComment,
+      parentCommentId: parentCommentId || null
+    });
+
     return res.status(201).json({
       message: "Comment posted successfully",
-      comment: {
-        id: comment.id,
-        body: comment.body,
-        createdAt: comment.createdAt,
-        updatedAt: comment.updatedAt,
-        author: comment.author,
-        replies: []
-      }
+      comment: serializedComment
     });
   } catch (error) {
     return next(error);

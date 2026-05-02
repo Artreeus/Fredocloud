@@ -35,6 +35,14 @@ export const useActionItemStore = create((set, get) => ({
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
+  applySocketActionItem: (nextActionItem) =>
+    set((state) => ({
+      actionItems: state.actionItems.some((actionItem) => actionItem.id === nextActionItem.id)
+        ? state.actionItems.map((actionItem) =>
+            actionItem.id === nextActionItem.id ? nextActionItem : actionItem
+          )
+        : [...state.actionItems, nextActionItem]
+    })),
   setViewMode: (viewMode) => set({ viewMode }),
   setFilters: (nextFilters) =>
     set((state) => ({

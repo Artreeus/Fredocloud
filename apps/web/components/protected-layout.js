@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TopNav } from "@/components/top-nav";
+import { WorkspaceRealtimeBridge } from "@/components/workspace-realtime-bridge";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -56,6 +57,7 @@ export function ProtectedLayout({ children }) {
       }}
     >
       <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)]" />
+      <WorkspaceRealtimeBridge workspaceId={activeWorkspace?.id} />
       <TopNav />
       <main className="relative mx-auto max-w-6xl px-6 py-10">{children}</main>
     </div>

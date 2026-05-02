@@ -27,6 +27,7 @@ export const useWorkspaceStore = create((set, get) => ({
   activeWorkspace: null,
   rolePermissions: [],
   members: [],
+  onlineUserIds: [],
   invitations: [],
   pendingInvitations: [],
   loading: false,
@@ -40,12 +41,35 @@ export const useWorkspaceStore = create((set, get) => ({
       activeWorkspace: null,
       rolePermissions: [],
       members: [],
+      onlineUserIds: [],
       invitations: [],
       pendingInvitations: [],
       loading: false,
       error: null,
       initialized: false
     }),
+  setPresenceSnapshot: (userIds = []) =>
+    set((state) => ({
+      onlineUserIds: userIds,
+      members: state.members.map((member) => ({
+        ...member,
+        online: userIds.includes(member.id)
+      }))
+    })),
+  setMemberPresence: (userId, online) =>
+    set((state) => ({
+      onlineUserIds: online
+        ? [...new Set([...state.onlineUserIds, userId])]
+        : state.onlineUserIds.filter((id) => id !== userId),
+      members: state.members.map((member) =>
+        member.id === userId
+          ? {
+              ...member,
+              online
+            }
+          : member
+      )
+    })),
   setActiveWorkspace: async (workspaceId) => {
     const nextActiveWorkspace = get().workspaces.find((workspace) => workspace.id === workspaceId);
 
@@ -114,7 +138,10 @@ export const useWorkspaceStore = create((set, get) => ({
     try {
       const payload = await apiRequest(`/api/workspaces/${workspaceId}/members`);
       set({
-        members: payload.members,
+        members: payload.members.map((member) => ({
+          ...member,
+          online: get().onlineUserIds.includes(member.id) || member.online
+        })),
         invitations: payload.invitations,
         error: null
       });
