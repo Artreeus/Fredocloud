@@ -7,6 +7,7 @@ const env = {
   port: Number(process.env.PORT) || 4000,
   clientUrl: process.env.CLIENT_URL || "http://localhost:3000",
   cookieDomain: process.env.COOKIE_DOMAIN || undefined,
+  cookieSameSite: process.env.COOKIE_SAME_SITE || undefined,
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET || "dev-access-secret",
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || "dev-refresh-secret",
   jwtAccessExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || "15m",

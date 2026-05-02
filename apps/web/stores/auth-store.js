@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { apiRequest } from "@/lib/api-client";
+import { clearSessionHintCookie, setSessionHintCookie } from "@/lib/session-hint";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -30,9 +31,11 @@ export const useAuthStore = create((set, get) => ({
 
     try {
       const payload = await apiRequest("/api/auth/me");
+      setSessionHintCookie();
       set({ user: payload.user, error: null });
       return payload.user;
     } catch (error) {
+      clearSessionHintCookie();
       set({ user: null, error: silent ? null : error.message });
       throw error;
     } finally {
@@ -49,9 +52,11 @@ export const useAuthStore = create((set, get) => ({
         method: "POST",
         body: JSON.stringify(values)
       });
+      setSessionHintCookie();
       set({ user: payload.user, error: null });
       return payload.user;
     } catch (error) {
+      clearSessionHintCookie();
       set({ error: error.message });
       throw error;
     } finally {
@@ -66,9 +71,11 @@ export const useAuthStore = create((set, get) => ({
         method: "POST",
         body: JSON.stringify(values)
       });
+      setSessionHintCookie();
       set({ user: payload.user, error: null });
       return payload.user;
     } catch (error) {
+      clearSessionHintCookie();
       set({ error: error.message });
       throw error;
     } finally {
@@ -83,6 +90,7 @@ export const useAuthStore = create((set, get) => ({
         method: "POST"
       });
     } finally {
+      clearSessionHintCookie();
       set({ user: null, loading: false, error: null, hydrated: true });
     }
   },

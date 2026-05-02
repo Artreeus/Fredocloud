@@ -44,9 +44,11 @@ async function compareToken(token, hash) {
 }
 
 function setAuthCookies(res, accessToken, refreshToken) {
+  const sameSite =
+    env.cookieSameSite || (env.nodeEnv === "production" ? "none" : "lax");
   const baseCookieOptions = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite,
     secure: env.nodeEnv === "production"
   };
 
@@ -66,9 +68,11 @@ function setAuthCookies(res, accessToken, refreshToken) {
 }
 
 function clearAuthCookies(res) {
+  const sameSite =
+    env.cookieSameSite || (env.nodeEnv === "production" ? "none" : "lax");
   const baseCookieOptions = {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite,
     secure: env.nodeEnv === "production"
   };
 
