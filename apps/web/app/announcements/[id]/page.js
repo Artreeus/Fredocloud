@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CommentThread } from "@/components/comment-thread";
+import { MentionTextarea } from "@/components/mention-textarea";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { ReactionBar } from "@/components/reaction-bar";
 import { useAnnouncementStore } from "@/stores/announcement-store";
@@ -10,6 +11,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function AnnouncementDetailPage({ params }) {
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
+  const members = useWorkspaceStore((state) => state.members);
   const announcement = useAnnouncementStore((state) => state.currentAnnouncement);
   const comments = useAnnouncementStore((state) => state.comments);
   const loading = useAnnouncementStore((state) => state.loading);
@@ -95,9 +97,10 @@ export default function AnnouncementDetailPage({ params }) {
             </h2>
 
             <form className="mt-6 space-y-4" onSubmit={handleAddComment}>
-              <textarea
+              <MentionTextarea
                 value={commentBody}
-                onChange={(event) => setCommentBody(event.target.value)}
+                onChange={setCommentBody}
+                members={members}
                 className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
                 placeholder="Add a comment..."
               />
@@ -112,7 +115,7 @@ export default function AnnouncementDetailPage({ params }) {
             </form>
 
             <div className="mt-8">
-              <CommentThread comments={comments} onReply={handleReply} loading={loading} />
+              <CommentThread comments={comments} onReply={handleReply} loading={loading} members={members} />
             </div>
 
             {!comments.length ? (

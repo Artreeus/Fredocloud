@@ -4,12 +4,16 @@ import { useEffect } from "react";
 import { disconnectWorkspaceSocket, getWorkspaceSocket } from "@/lib/socket-client";
 import { useActionItemStore } from "@/stores/action-item-store";
 import { useAnnouncementStore } from "@/stores/announcement-store";
+import { useAuthStore } from "@/stores/auth-store";
+import { useNotificationStore } from "@/stores/notification-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export function WorkspaceRealtimeBridge({ workspaceId }) {
+  const user = useAuthStore((state) => state.user);
   const applySocketAnnouncement = useAnnouncementStore((state) => state.applySocketAnnouncement);
   const applySocketComment = useAnnouncementStore((state) => state.applySocketComment);
   const applySocketActionItem = useActionItemStore((state) => state.applySocketActionItem);
+  const pushSocketNotification = useNotificationStore((state) => state.pushSocketNotification);
   const setPresenceSnapshot = useWorkspaceStore((state) => state.setPresenceSnapshot);
   const setMemberPresence = useWorkspaceStore((state) => state.setMemberPresence);
 
@@ -38,6 +42,12 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
       }
     }
 
+    function handleNotificationEvent(payload) {
+      if (payload?.notification) {
+        pushSocketNotification(payload.notification, user?.id);
+      }
+    }
+
     function handlePresenceSync(payload) {
       setPresenceSnapshot(payload?.userIds || []);
     }
@@ -58,6 +68,7 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
     socket.on("reaction:update", handleAnnouncementEvent);
     socket.on("comment:new", handleCommentEvent);
     socket.on("action-item:update", handleActionItemEvent);
+    socket.on("notification:new", handleNotificationEvent);
     socket.on("presence:sync", handlePresenceSync);
     socket.on("user:online", handleUserOnline);
     socket.on("user:offline", handleUserOffline);
@@ -67,6 +78,7 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
       socket.off("reaction:update", handleAnnouncementEvent);
       socket.off("comment:new", handleCommentEvent);
       socket.off("action-item:update", handleActionItemEvent);
+      socket.off("notification:new", handleNotificationEvent);
       socket.off("presence:sync", handlePresenceSync);
       socket.off("user:online", handleUserOnline);
       socket.off("user:offline", handleUserOffline);
@@ -76,8 +88,10 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
     applySocketActionItem,
     applySocketAnnouncement,
     applySocketComment,
+    pushSocketNotification,
     setMemberPresence,
     setPresenceSnapshot,
+    user?.id,
     workspaceId
   ]);
 

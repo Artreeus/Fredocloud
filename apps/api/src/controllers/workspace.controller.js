@@ -9,6 +9,7 @@ const {
   getWorkspacePermissionsOrThrow,
   syncWorkspaceRolePermissions
 } = require("../lib/permissions");
+const { createNotificationAndEmit } = require("./notification.controller");
 
 function validateAccentColor(value) {
   return /^#[0-9A-Fa-f]{6}$/.test(value);
@@ -277,15 +278,13 @@ async function inviteWorkspaceMember(req, res, next) {
     });
 
     if (invitedUser) {
-      await prisma.notification.create({
-        data: {
-          userId: invitedUser.id,
-          workspaceId: invite.workspaceId,
-          type: NotificationType.WORKSPACE_INVITE,
-          title: `Invitation to ${invite.workspace.name}`,
-          message: `${req.user.name} invited you to join ${invite.workspace.name} as ${role.toLowerCase()}.`,
-          entityId: invite.id
-        }
+      await createNotificationAndEmit({
+        userId: invitedUser.id,
+        workspaceId: invite.workspaceId,
+        type: NotificationType.WORKSPACE_INVITE,
+        title: `Invitation to ${invite.workspace.name}`,
+        message: `${req.user.name} invited you to join ${invite.workspace.name} as ${role.toLowerCase()}.`,
+        entityId: invite.id
       });
     }
 

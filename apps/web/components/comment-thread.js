@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { MentionTextarea, renderMentionText } from "@/components/mention-textarea";
 
-function CommentItem({ comment, onReply, loading, depth = 0 }) {
+function CommentItem({ comment, onReply, loading, members, depth = 0 }) {
   const [replyOpen, setReplyOpen] = useState(false);
   const [replyBody, setReplyBody] = useState("");
 
@@ -20,7 +21,7 @@ function CommentItem({ comment, onReply, loading, depth = 0 }) {
           <p className="text-sm font-medium text-slate-900">{comment.author?.name}</p>
           <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
         </div>
-        <p className="mt-3 text-sm leading-6 text-slate-600">{comment.body}</p>
+        <p className="mt-3 text-sm leading-6 text-slate-600">{renderMentionText(comment.body)}</p>
         <button
           type="button"
           onClick={() => setReplyOpen((current) => !current)}
@@ -30,9 +31,10 @@ function CommentItem({ comment, onReply, loading, depth = 0 }) {
         </button>
         {replyOpen ? (
           <form className="mt-3 space-y-3" onSubmit={handleReply}>
-            <textarea
+            <MentionTextarea
               value={replyBody}
-              onChange={(event) => setReplyBody(event.target.value)}
+              onChange={setReplyBody}
+              members={members}
               className="min-h-24 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
               placeholder="Write a reply..."
             />
@@ -55,6 +57,7 @@ function CommentItem({ comment, onReply, loading, depth = 0 }) {
               comment={reply}
               onReply={onReply}
               loading={loading}
+              members={members}
               depth={depth + 1}
             />
           ))}
@@ -64,11 +67,17 @@ function CommentItem({ comment, onReply, loading, depth = 0 }) {
   );
 }
 
-export function CommentThread({ comments, onReply, loading }) {
+export function CommentThread({ comments, onReply, loading, members }) {
   return (
     <div className="space-y-4">
       {comments.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} onReply={onReply} loading={loading} />
+        <CommentItem
+          key={comment.id}
+          comment={comment}
+          onReply={onReply}
+          loading={loading}
+          members={members}
+        />
       ))}
     </div>
   );

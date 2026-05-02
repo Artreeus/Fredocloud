@@ -3,6 +3,7 @@ const { assertWorkspacePermission } = require("../lib/permissions");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
 const { emitWorkspaceEvent } = require("../lib/socket");
+const { createNotificationAndEmit } = require("./notification.controller");
 
 const reactionLabels = {
   LIKE: { emoji: "👍", label: "Like" },
@@ -82,6 +83,11 @@ function serializeAnnouncement(announcement, currentUserId) {
   };
 }
 
+function extractMentionedUserIds(body) {
+  const matches = body.matchAll(/@\[[^\]]+\]\(([^)]+)\)/g);
+  return [...new Set([...matches].map((match) => match[1]).filter(Boolean))];
+}
+
 async function getAnnouncementOrThrow(announcementId, userId) {
   const announcement = await prisma.announcement.findUnique({
     where: { id: announcementId },
@@ -147,18 +153,20 @@ async function createAnnouncement(req, res, next) {
       select: { userId: true }
     });
 
-    await prisma.notification.createMany({
-      data: members
+    await Promise.all(
+      members
         .filter((member) => member.userId !== req.user.id)
-        .map((member) => ({
-          userId: member.userId,
-          workspaceId,
-          type: NotificationType.ANNOUNCEMENT_POSTED,
-          title,
-          message: `${req.user.name} published a new announcement.`,
-          entityId: announcement.id
-        }))
-    });
+        .map((member) =>
+          createNotificationAndEmit({
+            userId: member.userId,
+            workspaceId,
+            type: NotificationType.ANNOUNCEMENT_POSTED,
+            title,
+            message: `${req.user.name} published a new announcement.`,
+            entityId: announcement.id
+          })
+        )
+    );
 
     await prisma.auditLog.create({
       data: {
@@ -377,6 +385,33 @@ async function createComment(req, res, next) {
         }
       }
     });
+
+    const mentionedUserIds = extractMentionedUserIds(body);
+
+    if (mentionedUserIds.length) {
+      const validMembers = await prisma.workspaceMember.findMany({
+        where: {
+          workspaceId: announcement.workspaceId,
+          userId: {
+            in: mentionedUserIds.filter((userId) => userId !== req.user.id)
+          }
+        },
+        select: { userId: true }
+      });
+
+      await Promise.all(
+        validMembers.map((member) =>
+          createNotificationAndEmit({
+            userId: member.userId,
+            workspaceId: announcement.workspaceId,
+            type: NotificationType.COMMENT_MENTION,
+            title: `Mentioned in ${announcement.title}`,
+            message: `${req.user.name} mentioned you in a comment.`,
+            entityId: announcement.id
+          })
+        )
+      );
+    }
 
     const serializedComment = {
       id: comment.id,

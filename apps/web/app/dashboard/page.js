@@ -1,6 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from "recharts";
+import { apiRequest } from "@/lib/api-client";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -23,6 +35,8 @@ export default function DashboardPage() {
     description: "",
     accentColor: "#2745f2"
   });
+  const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -30,6 +44,20 @@ export default function DashboardPage() {
       clearError();
     }
   }, [clearError, error, pushToast]);
+
+  useEffect(() => {
+    if (!activeWorkspace?.id) {
+      return;
+    }
+
+    setAnalyticsLoading(true);
+    apiRequest(`/api/analytics/summary?workspaceId=${activeWorkspace.id}`)
+      .then((payload) => setAnalytics(payload))
+      .catch((analyticsError) => {
+        pushToast({ type: "error", message: analyticsError.message });
+      })
+      .finally(() => setAnalyticsLoading(false));
+  }, [activeWorkspace?.id, pushToast]);
 
   async function handleCreateWorkspace(event) {
     event.preventDefault();
@@ -47,6 +75,22 @@ export default function DashboardPage() {
   async function handleAcceptInvitation(inviteId) {
     await acceptInvitation(inviteId);
     pushToast({ type: "success", message: "Invitation accepted. Your workspace list has been updated." });
+  }
+
+  async function handleExport() {
+    if (!activeWorkspace?.id) {
+      return;
+    }
+
+    const csv = await apiRequest(`/api/analytics/export?workspaceId=${activeWorkspace.id}`);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${(activeWorkspace.name || "workspace").replace(/\s+/g, "-").toLowerCase()}-export.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    pushToast({ type: "success", message: "CSV export downloaded." });
   }
 
   return (
@@ -73,6 +117,13 @@ export default function DashboardPage() {
               style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
             >
               {showCreateForm ? "Close form" : "Create workspace"}
+            </button>
+            <button
+              type="button"
+              onClick={handleExport}
+              className="rounded-full border border-slate-200/80 bg-white/90 px-5 py-3 text-sm font-medium text-slate-700"
+            >
+              Export CSV
             </button>
           </div>
 
@@ -187,6 +238,97 @@ export default function DashboardPage() {
             ) : (
               <p className="text-sm text-slate-300">No pending workspace invitations right now.</p>
             )}
+          </div>
+        </article>
+      </section>
+
+      <section className="mt-6 grid gap-6">
+        <article className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+                Analytics
+              </p>
+              <h2 className="mt-3 font-display text-4xl text-slate-950">Workspace performance</h2>
+            </div>
+            <p className="text-sm text-slate-500">
+              {analyticsLoading ? "Refreshing live metrics..." : "Live view of goals, tasks, and activity."}
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total goals</p>
+              <p className="mt-3 text-3xl font-semibold text-slate-950">
+                {analytics?.stats?.totalGoals ?? "--"}
+              </p>
+            </div>
+            <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Completed this week</p>
+              <p className="mt-3 text-3xl font-semibold text-slate-950">
+                {analytics?.stats?.completedThisWeek ?? "--"}
+              </p>
+            </div>
+            <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Overdue tasks</p>
+              <p className="mt-3 text-3xl font-semibold text-rose-600">
+                {analytics?.stats?.overdueCount ?? "--"}
+              </p>
+            </div>
+            <div className="rounded-[1.8rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Active members</p>
+              <p className="mt-3 text-3xl font-semibold text-slate-950">
+                {analytics?.stats?.activeMembers ?? "--"}
+                <span className="ml-2 text-sm font-medium text-slate-500">
+                  / {analytics?.stats?.totalMembers ?? "--"}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-[2rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-sm font-semibold text-slate-950">Goal completion trend</p>
+              <p className="mt-1 text-sm text-slate-500">Completed vs total goals over recent weekly buckets.</p>
+              <div className="mt-6 h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics?.goalCompletionSeries || []}>
+                    <XAxis dataKey="label" stroke="#64748b" />
+                    <YAxis allowDecimals={false} stroke="#64748b" />
+                    <Tooltip />
+                    <Bar dataKey="totalGoals" fill="#cbd5e1" radius={[10, 10, 0, 0]} />
+                    <Bar dataKey="completedGoals" fill={activeWorkspace?.accentColor || "#2745f2"} radius={[10, 10, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200/80 bg-white/84 p-5">
+              <p className="text-sm font-semibold text-slate-950">Priority distribution</p>
+              <p className="mt-1 text-sm text-slate-500">How current action items are spread across priorities.</p>
+              <div className="mt-6 h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={analytics?.priorityDistribution || []}
+                      dataKey="value"
+                      nameKey="name"
+                      innerRadius={65}
+                      outerRadius={105}
+                      paddingAngle={4}
+                    >
+                      {(analytics?.priorityDistribution || []).map((entry, index) => (
+                        <Cell
+                          key={entry.name}
+                          fill={["#2745f2", "#0f766e", "#ea580c", "#dc2626"][index % 4]}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
           </div>
         </article>
       </section>

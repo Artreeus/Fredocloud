@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
+import { useNotificationStore } from "@/stores/notification-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 const navItems = [
@@ -23,12 +25,36 @@ function initials(name) {
     .toUpperCase();
 }
 
+function buildNotificationHref(notification) {
+  switch (notification.type) {
+    case "ANNOUNCEMENT_POSTED":
+    case "COMMENT_MENTION":
+      return notification.entityId ? `/announcements/${notification.entityId}` : "/announcements";
+    case "GOAL_ASSIGNED":
+      return notification.entityId ? `/goals/${notification.entityId}` : "/goals";
+    case "ACTION_ITEM_ASSIGNED":
+    case "ACTION_ITEM_DUE":
+      return "/action-items";
+    case "WORKSPACE_INVITE":
+      return "/dashboard";
+    default:
+      return "/dashboard";
+  }
+}
+
 export function TopNav() {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const loading = useAuthStore((state) => state.loading);
+  const notifications = useNotificationStore((state) => state.notifications);
+  const unreadCount = useNotificationStore((state) => state.unreadCount);
+  const notificationOpen = useNotificationStore((state) => state.open);
+  const toggleNotifications = useNotificationStore((state) => state.toggleOpen);
+  const closeNotifications = useNotificationStore((state) => state.close);
+  const fetchNotifications = useNotificationStore((state) => state.fetchNotifications);
+  const markRead = useNotificationStore((state) => state.markRead);
   const workspaces = useWorkspaceStore((state) => state.workspaces);
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const setActiveWorkspace = useWorkspaceStore((state) => state.setActiveWorkspace);
@@ -38,6 +64,18 @@ export function TopNav() {
     await logout();
     resetWorkspaceStore();
     router.push("/login");
+  }
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications({ silent: true }).catch(() => {});
+    }
+  }, [fetchNotifications, user]);
+
+  async function handleNotificationClick(notification) {
+    await markRead(notification.id).catch(() => {});
+    closeNotifications();
+    router.push(buildNotificationHref(notification));
   }
 
   return (
@@ -72,6 +110,58 @@ export function TopNav() {
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="relative">
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              className="relative rounded-full border border-slate-200/80 bg-white/88 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm"
+            >
+              Notifications
+              {unreadCount ? (
+                <span className="ml-2 rounded-full bg-rose-500 px-2 py-0.5 text-xs text-white">
+                  {unreadCount}
+                </span>
+              ) : null}
+            </button>
+            {notificationOpen ? (
+              <div className="absolute right-0 top-full z-30 mt-3 w-96 rounded-[1.7rem] border border-white/60 bg-white/92 p-3 shadow-float backdrop-blur-xl">
+                <div className="flex items-center justify-between px-2 py-2">
+                  <p className="text-sm font-semibold text-slate-950">Notifications</p>
+                  <span className="text-xs text-slate-500">{unreadCount} unread</span>
+                </div>
+                <div className="mt-2 space-y-2">
+                  {notifications.length ? (
+                    notifications.map((notification) => (
+                      <button
+                        key={notification.id}
+                        type="button"
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`w-full rounded-[1.3rem] border px-4 py-3 text-left transition ${
+                          notification.readAt
+                            ? "border-slate-200 bg-white text-slate-600"
+                            : "border-brand-200 bg-brand-50/70 text-slate-800"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-medium">{notification.title}</p>
+                            <p className="mt-1 text-xs leading-5">{notification.message}</p>
+                          </div>
+                          {!notification.readAt ? (
+                            <span className="mt-1 h-2.5 w-2.5 rounded-full bg-rose-500" />
+                          ) : null}
+                        </div>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="rounded-[1.3rem] border border-slate-200 bg-white px-4 py-6 text-sm text-slate-500">
+                      No notifications yet.
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
           <div className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/85 px-3 py-2 text-sm text-slate-600 lg:flex">
             <span
               className="h-3 w-3 rounded-full"

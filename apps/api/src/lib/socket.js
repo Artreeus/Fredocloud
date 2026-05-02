@@ -168,5 +168,6 @@ function initSocketServer(server) {
 
 module.exports = {
   emitWorkspaceEvent,
+  getActiveUserIds,
   initSocketServer
 };

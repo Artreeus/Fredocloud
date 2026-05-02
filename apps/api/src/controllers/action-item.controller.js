@@ -3,6 +3,7 @@ const { assertWorkspacePermission } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 const { emitWorkspaceEvent } = require("../lib/socket");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
+const { createNotificationAndEmit } = require("./notification.controller");
 
 function normalizeStatus(status) {
   if (!status) {
@@ -242,15 +243,13 @@ async function createActionItem(req, res, next) {
     });
 
     if (assigneeId && assigneeId !== req.user.id) {
-      await prisma.notification.create({
-        data: {
-          userId: assigneeId,
-          workspaceId,
-          type: NotificationType.ACTION_ITEM_ASSIGNED,
-          title: actionItem.title,
-          message: `${req.user.name} assigned you an action item.`,
-          entityId: actionItem.id
-        }
+      await createNotificationAndEmit({
+        userId: assigneeId,
+        workspaceId,
+        type: NotificationType.ACTION_ITEM_ASSIGNED,
+        title: actionItem.title,
+        message: `${req.user.name} assigned you an action item.`,
+        entityId: actionItem.id
       });
     }
 
