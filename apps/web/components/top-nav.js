@@ -141,7 +141,7 @@ export function TopNav() {
 
   return (
     <header className="sticky top-0 z-20 px-4 pt-4">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/60 bg-white/78 px-4 py-4 shadow-soft backdrop-blur-xl sm:px-5">
+      <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/60 bg-white/78 px-4 py-4 shadow-soft backdrop-blur-xl sm:px-5">
         <div className="flex min-w-0 items-center gap-4 lg:gap-6">
           <Link href="/dashboard" className="flex flex-col leading-none">
             <span className="font-display text-xl text-slate-950">FredoCloud</span>
