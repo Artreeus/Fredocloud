@@ -50,6 +50,10 @@ function setAuthCookies(res, accessToken, refreshToken) {
     secure: env.nodeEnv === "production"
   };
 
+  if (env.cookieDomain) {
+    baseCookieOptions.domain = env.cookieDomain;
+  }
+
   res.cookie(env.accessTokenCookieName, accessToken, {
     ...baseCookieOptions,
     maxAge: durationToMs(env.jwtAccessExpiresIn)
@@ -67,6 +71,10 @@ function clearAuthCookies(res) {
     sameSite: "lax",
     secure: env.nodeEnv === "production"
   };
+
+  if (env.cookieDomain) {
+    baseCookieOptions.domain = env.cookieDomain;
+  }
 
   res.clearCookie(env.accessTokenCookieName, baseCookieOptions);
   res.clearCookie(env.refreshTokenCookieName, baseCookieOptions);

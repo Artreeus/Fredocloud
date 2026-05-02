@@ -9,12 +9,13 @@ const { goalRouter } = require("./routes/goal.routes");
 const { notificationRouter } = require("./routes/notification.routes");
 const { uploadRouter } = require("./routes/upload.routes");
 const { workspaceRouter } = require("./routes/workspace.routes");
+const { env } = require("./config/env");
 
 const app = express();
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    origin: env.clientUrl,
     credentials: true
   })
 );
