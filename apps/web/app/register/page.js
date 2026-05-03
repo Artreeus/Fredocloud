@@ -59,7 +59,7 @@ export default function RegisterPage() {
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="font-semibold text-brand-700 transition hover:text-brand-800">
+          <Link href="/login" className="font-semibold text-brand-700 dark:text-brand-500 transition hover:text-brand-800 dark:hover:text-brand-400">
             Sign in instead
           </Link>
         </>
@@ -68,7 +68,7 @@ export default function RegisterPage() {
     >
       <form className="space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="name">
+          <label className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-300" htmlFor="name">
             Full Name
           </label>
           <input
@@ -76,13 +76,13 @@ export default function RegisterPage() {
             type="text"
             value={form.name}
             onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+            className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 text-sm text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 dark:focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:focus:ring-brand-500/20"
             placeholder="Jane Doe"
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="email">
+          <label className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-300" htmlFor="email">
             Workspace Email
           </label>
           <input
@@ -90,13 +90,13 @@ export default function RegisterPage() {
             type="email"
             value={form.email}
             onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+            className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 text-sm text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 dark:focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:focus:ring-brand-500/20"
             placeholder="jane@fredocloud.com"
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="password">
+          <label className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-300" htmlFor="password">
             Password
           </label>
           <div className="relative flex items-center">
@@ -107,13 +107,13 @@ export default function RegisterPage() {
               onChange={(event) =>
                 setForm((current) => ({ ...current, password: event.target.value }))
               }
-              className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 pr-12 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 pr-12 text-sm text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 dark:focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:focus:ring-brand-500/20"
               placeholder="At least 8 characters"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 transition hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300"
             >
               {showPassword ? (
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +131,7 @@ export default function RegisterPage() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="confirmPassword">
+          <label className="text-sm font-semibold tracking-wide text-slate-700 dark:text-slate-300" htmlFor="confirmPassword">
             Confirm Password
           </label>
           <div className="relative flex items-center">
@@ -142,13 +142,13 @@ export default function RegisterPage() {
               onChange={(event) =>
                 setForm((current) => ({ ...current, confirmPassword: event.target.value }))
               }
-              className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 pr-12 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-5 py-3.5 pr-12 text-sm text-slate-900 dark:text-white outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-brand-500 dark:focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 dark:focus:ring-brand-500/20"
               placeholder="Repeat password"
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 dark:text-slate-500 transition hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-300"
             >
               {showConfirmPassword ? (
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -166,7 +166,7 @@ export default function RegisterPage() {
         </div>
 
         {localError || storeError ? (
-          <div className="flex items-center gap-3 rounded-2xl border border-rose-100 bg-rose-50 px-5 py-3.5 text-sm text-rose-700 animate-fade-in">
+          <div className="flex items-center gap-3 rounded-2xl border border-rose-100 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-900/20 px-5 py-3.5 text-sm text-rose-700 dark:text-rose-400 animate-fade-in">
             <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -177,7 +177,7 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-6 py-4 text-sm font-bold text-white transition-all hover:bg-slate-900 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-950 dark:bg-brand-600 px-6 py-4 text-sm font-bold text-white transition-all hover:bg-slate-900 dark:hover:bg-brand-500 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300 dark:disabled:bg-slate-800"
         >
           <span className="relative z-10">{loading ? "Creating account..." : "Create Account"}</span>
         </button>
