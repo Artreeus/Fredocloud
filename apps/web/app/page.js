@@ -63,7 +63,7 @@ export default function HomePage() {
             Welcome to the new standard for teamwork
           </div>
           <h1 className="font-display text-5xl font-medium leading-[1.1] text-slate-950 sm:text-6xl lg:text-7xl">
-            Unify your team's work,
+            Unify your team&apos;s work,
             <span className="block text-brand-600 italic">without the chaos.</span>
           </h1>
           <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl">
@@ -120,7 +120,7 @@ export default function HomePage() {
               },
               {
                 title: "Deep Analytics",
-                desc: "Gain insights into your team's velocity, overdue tasks, and milestone completion rates with beautiful charts.",
+                desc: "Gain insights into your team&apos;s velocity, overdue tasks, and milestone completion rates with beautiful charts.",
                 icon: "📊"
               }
             ].map((feature, idx) => (
@@ -143,7 +143,7 @@ export default function HomePage() {
                 <p className="text-sm font-bold uppercase tracking-widest text-terracotta">Demo Account Included</p>
                 <h2 className="mt-4 font-display text-4xl text-white sm:text-5xl">Experience the speed firsthand.</h2>
                 <p className="mt-6 text-lg leading-relaxed text-slate-300">
-                  We've seeded a fully-functional workspace so you don't have to start from scratch. Log in with the demo credentials to explore Kanban boards, create goals, and see how permissions work instantly.
+                  We&apos;ve seeded a fully-functional workspace so you don&apos;t have to start from scratch. Log in with the demo credentials to explore Kanban boards, create goals, and see how permissions work instantly.
                 </p>
                 <div className="mt-8 space-y-4 rounded-2xl bg-white/10 p-6 backdrop-blur-md">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
