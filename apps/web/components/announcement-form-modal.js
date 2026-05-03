@@ -4,18 +4,32 @@ import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
-export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
-  const [title, setTitle] = useState("");
+export function AnnouncementFormModal({
+  open,
+  onClose,
+  onSubmit,
+  onDelete,
+  canDelete = false,
+  loading,
+  initialValues,
+  modalTitle = "Create announcement"
+}) {
+  const [announcementTitle, setAnnouncementTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (!open) {
-      setTitle("");
+      setAnnouncementTitle("");
       setBody("");
       setError("");
+      return;
     }
-  }, [open]);
+
+    setAnnouncementTitle(initialValues?.title || "");
+    setBody(initialValues?.body || "");
+    setError("");
+  }, [initialValues, open]);
 
   if (!open) {
     return null;
@@ -25,7 +39,7 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
     event.preventDefault();
     setError("");
 
-    if (!title.trim()) {
+    if (!announcementTitle.trim()) {
       setError("Announcement title is required.");
       return;
     }
@@ -35,7 +49,7 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
       return;
     }
 
-    await onSubmit({ title, body });
+    await onSubmit({ title: announcementTitle, body });
   }
 
   return (
@@ -47,7 +61,7 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
               Announcements
             </p>
             <h2 className="mt-3 font-display text-3xl text-slate-950 dark:text-white">
-              Create announcement
+              {modalTitle}
             </h2>
           </div>
           <button
@@ -64,8 +78,8 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
             <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Title</span>
             <input
               type="text"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
+              value={announcementTitle}
+              onChange={(event) => setAnnouncementTitle(event.target.value)}
               className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               placeholder="System update, team lunch, etc."
             />
@@ -79,20 +93,36 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
               {error}
             </p>
           ) : null}
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Publishing...
-              </>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {onDelete && canDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={loading}
+                className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-3.5 text-sm font-bold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-300 dark:hover:bg-rose-950/30"
+              >
+                Delete announcement
+              </button>
             ) : (
-              "Publish announcement"
+              <span />
             )}
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : initialValues ? (
+                "Save announcement"
+              ) : (
+                "Publish announcement"
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>

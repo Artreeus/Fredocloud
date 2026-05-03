@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { hasPermission } from "@/lib/permissions";
+import { AnnouncementFormModal } from "@/components/announcement-form-modal";
 import { Loader } from "@/components/ui/loader";
 import { CommentThread } from "@/components/comment-thread";
 import { MentionTextarea } from "@/components/mention-textarea";
@@ -12,6 +15,8 @@ import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function AnnouncementDetailPage({ params }) {
+  const router = useRouter();
+  const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
   const announcement = useAnnouncementStore((state) => state.currentAnnouncement);
   const comments = useAnnouncementStore((state) => state.comments);
@@ -19,10 +24,15 @@ export default function AnnouncementDetailPage({ params }) {
   const error = useAnnouncementStore((state) => state.error);
   const clearError = useAnnouncementStore((state) => state.clearError);
   const fetchAnnouncement = useAnnouncementStore((state) => state.fetchAnnouncement);
+  const updateAnnouncement = useAnnouncementStore((state) => state.updateAnnouncement);
+  const deleteAnnouncement = useAnnouncementStore((state) => state.deleteAnnouncement);
   const addComment = useAnnouncementStore((state) => state.addComment);
   const toggleReaction = useAnnouncementStore((state) => state.toggleReaction);
   const [commentBody, setCommentBody] = useState("");
+  const [showEditModal, setShowEditModal] = useState(false);
   const pushToast = useToastStore((state) => state.pushToast);
+  const canEditAnnouncement = hasPermission(activeWorkspace, "POST_ANNOUNCEMENT");
+  const canDeleteContent = hasPermission(activeWorkspace, "DELETE_CONTENT");
 
   useEffect(() => {
     if (params?.id) {
@@ -55,20 +65,54 @@ export default function AnnouncementDetailPage({ params }) {
     await fetchAnnouncement(params.id);
   }
 
+  async function handleEditAnnouncement(values) {
+    await updateAnnouncement(params.id, values);
+    setShowEditModal(false);
+    pushToast({ type: "success", message: "Announcement updated." });
+  }
+
+  async function handleDeleteAnnouncement() {
+    if (!announcement) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete "${announcement.title}"? This cannot be undone.`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteAnnouncement(params.id);
+    setShowEditModal(false);
+    pushToast({ type: "success", message: "Announcement deleted." });
+    router.push("/announcements");
+  }
+
   return (
     <ProtectedLayout>
       {announcement ? (
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
               {announcement.pinned ? (
                 <span className="rounded-full bg-amber-50 dark:bg-amber-900/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   Pinned
                 </span>
               ) : null}
-              <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-                {new Date(announcement.publishedAt || announcement.createdAt).toLocaleString()}
-              </span>
+                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                  {new Date(announcement.publishedAt || announcement.createdAt).toLocaleString()}
+                </span>
+              </div>
+              {canEditAnnouncement ? (
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(true)}
+                  className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                >
+                  Edit announcement
+                </button>
+              ) : null}
             </div>
             <h1 className="mt-4 font-display text-5xl text-slate-950 dark:text-white">
               {announcement.title}
@@ -135,7 +179,16 @@ export default function AnnouncementDetailPage({ params }) {
           {loading ? <Loader size="lg" /> : <p className="text-sm font-medium text-slate-500">Announcement not found.</p>}
         </div>
       )}
-
+      <AnnouncementFormModal
+        open={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleEditAnnouncement}
+        onDelete={handleDeleteAnnouncement}
+        canDelete={canDeleteContent}
+        loading={loading}
+        initialValues={announcement}
+        modalTitle="Edit announcement"
+      />
     </ProtectedLayout>
   );
 }

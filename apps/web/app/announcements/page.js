@@ -20,13 +20,17 @@ export default function AnnouncementsPage() {
   const pendingReactionIds = useAnnouncementStore((state) => state.pendingReactionIds);
   const fetchAnnouncements = useAnnouncementStore((state) => state.fetchAnnouncements);
   const createAnnouncement = useAnnouncementStore((state) => state.createAnnouncement);
+  const updateAnnouncement = useAnnouncementStore((state) => state.updateAnnouncement);
+  const deleteAnnouncement = useAnnouncementStore((state) => state.deleteAnnouncement);
   const togglePin = useAnnouncementStore((state) => state.togglePin);
   const toggleReaction = useAnnouncementStore((state) => state.toggleReaction);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const pushToast = useToastStore((state) => state.pushToast);
 
   const canCreate = hasPermission(activeWorkspace, "POST_ANNOUNCEMENT");
   const canPin = hasPermission(activeWorkspace, "PIN_ANNOUNCEMENT");
+  const canDeleteContent = hasPermission(activeWorkspace, "DELETE_CONTENT");
 
   useEffect(() => {
     if (activeWorkspace?.id) {
@@ -49,6 +53,30 @@ export default function AnnouncementsPage() {
     setShowCreateModal(false);
     await fetchAnnouncements({ workspaceId: activeWorkspace.id });
     pushToast({ type: "success", message: "Announcement published." });
+  }
+
+  async function handleUpdateAnnouncement(values) {
+    await updateAnnouncement(editingAnnouncement.id, values);
+    setEditingAnnouncement(null);
+    pushToast({ type: "success", message: "Announcement updated." });
+  }
+
+  async function handleDeleteAnnouncement() {
+    if (!editingAnnouncement) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete "${editingAnnouncement.title}"? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteAnnouncement(editingAnnouncement.id);
+    setEditingAnnouncement(null);
+    pushToast({ type: "success", message: "Announcement deleted." });
   }
 
   async function handleTogglePin(announcement) {
@@ -117,13 +145,24 @@ export default function AnnouncementsPage() {
                     <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">By {announcement.author?.name}</p>
                   </div>
                   {canPin ? (
-                    <button
-                      type="button"
-                      onClick={() => handleTogglePin(announcement)}
-                      className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                    >
-                      {announcement.pinned ? "Unpin" : "Pin"}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleTogglePin(announcement)}
+                        className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                      >
+                        {announcement.pinned ? "Unpin" : "Pin"}
+                      </button>
+                      {canCreate ? (
+                        <button
+                          type="button"
+                          onClick={() => setEditingAnnouncement(announcement)}
+                          className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                        >
+                          Edit
+                        </button>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
 
@@ -161,6 +200,16 @@ export default function AnnouncementsPage() {
         onClose={() => setShowCreateModal(false)}
         onSubmit={handleCreateAnnouncement}
         loading={loading}
+      />
+      <AnnouncementFormModal
+        open={Boolean(editingAnnouncement)}
+        onClose={() => setEditingAnnouncement(null)}
+        onSubmit={handleUpdateAnnouncement}
+        onDelete={handleDeleteAnnouncement}
+        canDelete={canDeleteContent}
+        loading={loading}
+        initialValues={editingAnnouncement}
+        modalTitle="Edit announcement"
       />
     </ProtectedLayout>
   );

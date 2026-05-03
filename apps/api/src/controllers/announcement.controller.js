@@ -193,6 +193,42 @@ async function createAnnouncement(req, res, next) {
   }
 }
 
+async function updateAnnouncement(req, res, next) {
+  try {
+    const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(announcement.workspaceId, req.user.id, Permission.POST_ANNOUNCEMENT);
+    const { title, body } = req.body;
+
+    if (!title || !body) {
+      throw createError("title and body are required", 400);
+    }
+
+    const updatedAnnouncement = await prisma.announcement.update({
+      where: { id: announcement.id },
+      data: {
+        title,
+        body
+      },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true, avatarUrl: true }
+        },
+        reactions: true,
+        _count: {
+          select: { comments: true }
+        }
+      }
+    });
+
+    return res.status(200).json({
+      message: "Announcement updated successfully",
+      announcement: serializeAnnouncement(updatedAnnouncement, req.user.id)
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function listAnnouncements(req, res, next) {
   try {
     const { workspaceId, page = 1, pageSize = 10 } = req.query;
@@ -461,12 +497,31 @@ async function listComments(req, res, next) {
   }
 }
 
+async function deleteAnnouncement(req, res, next) {
+  try {
+    const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
+    await assertWorkspacePermission(announcement.workspaceId, req.user.id, Permission.DELETE_CONTENT);
+
+    await prisma.announcement.delete({
+      where: { id: announcement.id }
+    });
+
+    return res.status(200).json({
+      message: "Announcement deleted successfully"
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   createAnnouncement,
   createComment,
+  deleteAnnouncement,
   getAnnouncement,
   listAnnouncements,
   listComments,
   pinAnnouncement,
-  toggleReaction
+  toggleReaction,
+  updateAnnouncement
 };

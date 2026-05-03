@@ -205,6 +205,60 @@ export const useAnnouncementStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  updateAnnouncement: async (announcementId, values) => {
+    set({ loading: true, error: null });
+
+    try {
+      const payload = await apiRequest(`/api/announcements/${announcementId}`, {
+        method: "PATCH",
+        body: JSON.stringify(values)
+      });
+
+      set((state) => ({
+        currentAnnouncement:
+          state.currentAnnouncement?.id === announcementId
+            ? {
+                ...state.currentAnnouncement,
+                ...payload.announcement,
+                comments: state.currentAnnouncement.comments
+              }
+            : state.currentAnnouncement,
+        announcements: state.announcements.map((announcement) =>
+          announcement.id === announcementId ? payload.announcement : announcement
+        ),
+        error: null
+      }));
+
+      return payload.announcement;
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  deleteAnnouncement: async (announcementId) => {
+    set({ loading: true, error: null });
+
+    try {
+      await apiRequest(`/api/announcements/${announcementId}`, {
+        method: "DELETE"
+      });
+
+      set((state) => ({
+        announcements: state.announcements.filter((announcement) => announcement.id !== announcementId),
+        currentAnnouncement:
+          state.currentAnnouncement?.id === announcementId ? null : state.currentAnnouncement,
+        comments: state.currentAnnouncement?.id === announcementId ? [] : state.comments,
+        error: null
+      }));
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
   togglePin: async (announcementId, pinned) => {
     set({ loading: true, error: null });
 
