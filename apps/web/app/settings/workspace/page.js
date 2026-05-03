@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth-store";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 import { CustomSelect } from "@/components/ui/select";
+import { Loader } from "@/components/ui/loader";
 import { Loader2 } from "lucide-react";
 
 const roleOptions = ["ADMIN", "MEMBER"];
@@ -23,6 +24,19 @@ const permissionLabels = {
   UPDATE_ACTION_ITEM: "Update action items",
   DELETE_CONTENT: "Delete content",
   MANAGE_WORKSPACE: "Manage workspace"
+};
+
+const visiblePermissionsByRole = {
+  OWNER: Object.keys(permissionLabels),
+  ADMIN: Object.keys(permissionLabels),
+  MEMBER: [
+    "CREATE_GOAL",
+    "UPDATE_GOAL",
+    "POST_ANNOUNCEMENT",
+    "PIN_ANNOUNCEMENT",
+    "CREATE_ACTION_ITEM",
+    "UPDATE_ACTION_ITEM"
+  ]
 };
 
 export default function WorkspaceSettingsPage() {
@@ -380,7 +394,9 @@ export default function WorkspaceSettingsPage() {
                       )}
                     </div>
                     <div className="grid gap-2">
-                      {roleEntry.permissions.map((permissionEntry) => (
+                      {roleEntry.permissions
+                        .filter((p) => visiblePermissionsByRole[roleEntry.role]?.includes(p.permission))
+                        .map((permissionEntry) => (
                         <label
                           key={`${roleEntry.role}-${permissionEntry.permission}`}
                           className="flex cursor-pointer items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-900/30 px-4 py-3 text-[11px] transition hover:bg-slate-100 dark:hover:bg-white/[0.02]"
