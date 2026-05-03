@@ -22,7 +22,10 @@ const users = [
   { id: "seed-user-priya", name: "Priya Das", email: "priya@fredocloud.com" },
   { id: "seed-user-jordan", name: "Jordan Lee", email: "jordan@fredocloud.com" },
   { id: "seed-user-elena", name: "Elena Garcia", email: "elena@fredocloud.com" },
-  { id: "seed-user-maya", name: "Maya Noor", email: "maya@fredocloud.com" }
+  { id: "seed-user-maya", name: "Maya Noor", email: "maya@fredocloud.com" },
+  { id: "seed-user-alex", name: "Alex Rivera", email: "alex@fredocloud.com" },
+  { id: "seed-user-sam", name: "Sam Wilson", email: "sam@fredocloud.com" },
+  { id: "seed-user-taylor", name: "Taylor Smith", email: "taylor@fredocloud.com" }
 ];
 
 const workspaceBlueprints = [
@@ -430,6 +433,126 @@ const workspaceBlueprints = [
         entityType: "Workspace",
         entityId: "seed-workspace-ops",
         metadata: { seeded: true, label: "Ops workspace" }
+      }
+    ]
+  },
+  {
+    id: "seed-workspace-marketing",
+    name: "Marketing Launchpad",
+    description: "Hub for campaign coordination, brand management, and market expansion.",
+    accentColor: "#f59e0b",
+    ownerId: "seed-user-alex",
+    members: [
+      { userId: "seed-user-alex", role: WorkspaceRole.OWNER },
+      { userId: "seed-user-sam", role: WorkspaceRole.ADMIN },
+      { userId: "seed-user-taylor", role: WorkspaceRole.MEMBER },
+      { userId: "seed-user-demo", role: WorkspaceRole.MEMBER }
+    ],
+    goals: [
+      {
+        id: "seed-goal-marketing-campaign",
+        title: "Q3 Global Awareness Campaign",
+        description: "Execute a multi-channel campaign to increase brand visibility by 40%.",
+        status: "IN_PROGRESS",
+        priority: Priority.HIGH,
+        progress: 35,
+        dueDate: "2026-09-30T00:00:00.000Z",
+        createdById: "seed-user-alex",
+        assigneeId: "seed-user-sam",
+        milestones: [
+          {
+            id: "seed-milestone-marketing-creative",
+            title: "Finalize creative assets",
+            progress: 100,
+            ownerId: "seed-user-taylor"
+          },
+          {
+            id: "seed-milestone-marketing-ads",
+            title: "Setup ad platforms",
+            progress: 10,
+            ownerId: "seed-user-sam"
+          }
+        ],
+        updates: [
+          {
+            id: "seed-goal-update-marketing-1",
+            authorId: "seed-user-taylor",
+            body: "The new ad banners and social videos are ready for review."
+          }
+        ]
+      },
+      {
+        id: "seed-goal-brand-refresh",
+        title: "Brand Identity Refresh",
+        description: "Modernize the brand voice and visual elements across all platforms.",
+        status: "NOT_STARTED",
+        priority: Priority.MEDIUM,
+        progress: 5,
+        dueDate: "2026-11-15T00:00:00.000Z",
+        createdById: "seed-user-alex",
+        assigneeId: "seed-user-taylor",
+        milestones: [
+          {
+            id: "seed-milestone-brand-audit",
+            title: "Complete brand audit",
+            progress: 20,
+            ownerId: "seed-user-alex"
+          }
+        ],
+        updates: []
+      }
+    ],
+    announcements: [
+      {
+        id: "seed-announcement-marketing-welcome",
+        title: "Welcome to the Marketing Launchpad!",
+        body: "<p>This is where we coordinate all things marketing. Please check the 'Goals' section for our latest campaign updates.</p>",
+        pinned: true,
+        authorId: "seed-user-alex",
+        publishedAt: "2026-05-01T10:00:00.000Z",
+        comments: [
+          {
+            id: "seed-comment-marketing-welcome-1",
+            authorId: "seed-user-sam",
+            body: "Great to have this centralized. Excited to get Q3 moving!"
+          }
+        ],
+        reactions: [
+          { id: "seed-reaction-marketing-welcome-like", userId: "seed-user-demo", type: ReactionType.LIKE }
+        ]
+      }
+    ],
+    actionItems: [
+      {
+        id: "seed-action-marketing-copy",
+        title: "Review campaign ad copy",
+        description: "Approve the messaging for the upcoming LinkedIn and Twitter ads.",
+        assigneeId: "seed-user-alex",
+        goalId: "seed-goal-marketing-campaign",
+        status: ActionItemStatus.IN_PROGRESS,
+        priority: Priority.HIGH,
+        dueDate: "2026-05-10T00:00:00.000Z"
+      },
+      {
+        id: "seed-action-marketing-social",
+        title: "Finalize social media calendar",
+        description: "Ensure all posts are scheduled for the next two weeks.",
+        assigneeId: "seed-user-taylor",
+        goalId: "seed-goal-marketing-campaign",
+        status: ActionItemStatus.OPEN,
+        priority: Priority.MEDIUM,
+        dueDate: "2026-05-12T00:00:00.000Z"
+      }
+    ],
+    notifications: [],
+    auditLogs: [
+      {
+        id: "seed-audit-marketing-workspace",
+        actorId: "seed-user-alex",
+        action: AuditAction.WORKSPACE_CREATED,
+        entityType: "Workspace",
+        entityId: "seed-workspace-marketing",
+        metadata: { seeded: true, label: "Marketing workspace" }
       }
     ]
   }
