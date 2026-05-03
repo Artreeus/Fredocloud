@@ -13,6 +13,7 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@repo/types": "workspace:*",
     "@repo/utils": "workspace:*",
+    "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "14.2.35",
     "next-themes": "^0.4.6",

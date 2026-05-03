@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { motion } from "framer-motion";
 
 export function AuthFormShell({ title, subtitle, children, footer, eyebrow = "FredoCloud Team Hub" }) {
   return (
@@ -27,7 +30,12 @@ export function AuthFormShell({ title, subtitle, children, footer, eyebrow = "Fr
         </div>
 
         {/* Main Card */}
-        <section className="grid w-full overflow-hidden rounded-[2.5rem] border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 shadow-float backdrop-blur-2xl lg:grid-cols-2">
+        <motion.section 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="grid w-full overflow-hidden rounded-[2.5rem] border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 shadow-float backdrop-blur-2xl lg:grid-cols-2"
+        >
           {/* Decorative Side (Left) - Using original brand colors */}
           <aside className="relative hidden flex-col justify-between overflow-hidden bg-slate-950 dark:bg-slate-950/50 p-10 text-white lg:flex border-r border-transparent dark:border-slate-800/50">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.2),transparent_40%)]" />
@@ -80,7 +88,7 @@ export function AuthFormShell({ title, subtitle, children, footer, eyebrow = "Fr
               )}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Floating Credit */}
         <p className="text-[10px] uppercase tracking-[0.4em] text-slate-500 dark:text-slate-600">
