@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
 export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
@@ -38,21 +39,21 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-3xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 px-6 py-10 backdrop-blur-sm">
+      <div className="w-full max-w-3xl rounded-[2.2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-2xl animate-in zoom-in duration-300">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
               Announcements
             </p>
-            <h2 className="mt-3 font-display text-3xl text-slate-950">
+            <h2 className="mt-3 font-display text-3xl text-slate-950 dark:text-white">
               Create announcement
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600"
+            className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-slate-700"
           >
             Close
           </button>
@@ -60,27 +61,37 @@ export function AnnouncementFormModal({ open, onClose, onSubmit, loading }) {
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Title</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Title</span>
             <input
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
+              placeholder="System update, team lunch, etc."
             />
           </label>
           <div>
-            <span className="mb-2 block text-sm font-medium text-slate-700">Body</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Body</span>
             <RichTextEditor value={body} onChange={setBody} placeholder="Share an update with the team..." />
           </div>
           {error ? (
-            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+            <p className="rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-4 py-3 text-sm font-medium text-rose-700 dark:text-rose-400">
+              {error}
+            </p>
           ) : null}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-medium text-white disabled:bg-slate-400"
+            className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
           >
-            {loading ? "Publishing..." : "Publish announcement"}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Publishing...
+              </>
+            ) : (
+              "Publish announcement"
+            )}
           </button>
         </form>
       </div>

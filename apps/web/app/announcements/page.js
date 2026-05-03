@@ -9,6 +9,7 @@ import { ReactionBar } from "@/components/reaction-bar";
 import { useAnnouncementStore } from "@/stores/announcement-store";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
+import { Loader } from "@/components/ui/loader";
 
 export default function AnnouncementsPage() {
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
@@ -61,15 +62,15 @@ export default function AnnouncementsPage() {
   return (
     <ProtectedLayout>
       <section className="space-y-6">
-        <div className="flex flex-wrap items-start justify-between gap-4 rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+        <div className="flex flex-wrap items-start justify-between gap-4 rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
               Announcements
             </p>
-            <h1 className="mt-4 font-display text-5xl text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950 dark:text-white">
               Team communication
             </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">
+            <p className="mt-5 max-w-2xl text-sm leading-7 text-slate-600 dark:text-slate-400">
               Pinned updates stay on top, while recent announcements keep everyone aligned.
             </p>
           </div>
@@ -77,79 +78,84 @@ export default function AnnouncementsPage() {
             <button
               type="button"
               onClick={() => setShowCreateModal(true)}
-              className="rounded-full px-5 py-3 text-sm font-medium text-white"
-              style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+              className="rounded-full bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
             >
               Create announcement
             </button>
           ) : (
-            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600">
+            <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400">
               Members can read and react
             </span>
           )}
         </div>
 
-        <div className="space-y-5">
-          {announcements.map((announcement) => (
-            <article
-              key={announcement.id}
-              className="rounded-[2.1rem] border border-white/60 bg-white/80 p-6 shadow-float backdrop-blur-xl"
-            >
-              <div className="flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {announcement.pinned ? (
-                      <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
-                        Pinned
+        {loading && announcements.length === 0 ? (
+          <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <Loader size="lg" />
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {announcements.map((announcement) => (
+              <article
+                key={announcement.id}
+                className="rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm transition-all hover:shadow-md"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      {announcement.pinned ? (
+                        <span className="rounded-full bg-amber-50 dark:bg-amber-900/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+                          Pinned
+                        </span>
+                      ) : null}
+                      <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                        {new Date(announcement.publishedAt || announcement.createdAt).toLocaleDateString()}
                       </span>
-                    ) : null}
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
-                      {new Date(announcement.publishedAt || announcement.createdAt).toLocaleDateString()}
-                    </span>
+                    </div>
+                    <h2 className="mt-4 font-display text-3xl text-slate-950 dark:text-white">
+                      {announcement.title}
+                    </h2>
+                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">By {announcement.author?.name}</p>
                   </div>
-                  <h2 className="mt-4 font-display text-3xl text-slate-950">
-                    {announcement.title}
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-500">By {announcement.author?.name}</p>
+                  {canPin ? (
+                    <button
+                      type="button"
+                      onClick={() => handleTogglePin(announcement)}
+                      className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                    >
+                      {announcement.pinned ? "Unpin" : "Pin"}
+                    </button>
+                  ) : null}
                 </div>
-                {canPin ? (
-                  <button
-                    type="button"
-                    onClick={() => handleTogglePin(announcement)}
-                    className="rounded-full border border-slate-200/80 bg-white/90 px-4 py-2 text-sm text-slate-700"
+
+                <div
+                  className="prose prose-slate dark:prose-invert mt-6 max-w-none text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: announcement.body }}
+                />
+
+                <div className="mt-6 flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <ReactionBar
+                      reactionSummary={announcement.reactionSummary}
+                      onToggle={(type) => handleToggleReaction(announcement.id, type)}
+                      loading={loading || pendingReactionIds[announcement.id]}
+                    />
+                  <Link
+                    href={`/announcements/${announcement.id}`}
+                    className="text-sm font-semibold text-slate-600 dark:text-slate-400 transition hover:text-brand-600"
                   >
-                    {announcement.pinned ? "Unpin" : "Pin"}
-                  </button>
-                ) : null}
+                    {announcement.commentCount} comments
+                  </Link>
+                </div>
+              </article>
+            ))}
+
+            {!announcements.length ? (
+              <div className="rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center text-sm font-medium text-slate-500 dark:text-slate-400 shadow-sm">
+                No announcements yet for this workspace.
               </div>
-
-              <div
-                className="prose prose-slate mt-6 max-w-none text-sm"
-                dangerouslySetInnerHTML={{ __html: announcement.body }}
-              />
-
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-                  <ReactionBar
-                    reactionSummary={announcement.reactionSummary}
-                    onToggle={(type) => handleToggleReaction(announcement.id, type)}
-                    loading={loading || pendingReactionIds[announcement.id]}
-                  />
-                <Link
-                  href={`/announcements/${announcement.id}`}
-                  className="text-sm font-medium text-slate-700"
-                >
-                  {announcement.commentCount} comments
-                </Link>
-              </div>
-            </article>
-          ))}
-
-          {!loading && !announcements.length ? (
-            <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
-              No announcements yet for this workspace.
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        )}
       </section>
 
       <AnnouncementFormModal
