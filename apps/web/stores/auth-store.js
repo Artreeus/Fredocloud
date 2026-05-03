@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { apiRequest } from "@/lib/api-client";
 import { clearSessionHintCookie, setSessionHintCookie } from "@/lib/session-hint";
+import { useToastStore } from "@/stores/toast-store";
 
 export const useAuthStore = create((set, get) => ({
   user: null,
@@ -54,6 +55,7 @@ export const useAuthStore = create((set, get) => ({
       });
       setSessionHintCookie();
       set({ user: payload.user, error: null });
+      useToastStore.getState().pushToast({ type: "success", message: "Successfully logged in" });
       return payload.user;
     } catch (error) {
       clearSessionHintCookie();
@@ -89,6 +91,7 @@ export const useAuthStore = create((set, get) => ({
       await apiRequest("/api/auth/logout", {
         method: "POST"
       });
+      useToastStore.getState().pushToast({ type: "success", message: "Successfully logged out" });
     } finally {
       clearSessionHintCookie();
       set({ user: null, loading: false, error: null, hydrated: true });
