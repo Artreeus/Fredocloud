@@ -125,7 +125,7 @@ export default function WorkspaceSettingsPage() {
         <Loader modal size="xl" />
       )}
       
-      <div className="mx-auto max-w-4xl">
+      <div className="mx-auto max-w-6xl">
         {/* Header & Tabs */}
         <div className="mb-10">
           <h1 className="font-display text-4xl text-slate-950 dark:text-white mb-2">
@@ -246,21 +246,21 @@ export default function WorkspaceSettingsPage() {
 
           {activeTab === "members" && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
-              <article className="rounded-[2.3rem] border border-slate-800 bg-slate-950 p-8 text-white shadow-xl">
+              <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 text-slate-950 dark:text-white shadow-xl">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <h2 className="font-display text-2xl text-white">Team Access</h2>
+                    <h2 className="font-display text-2xl text-slate-950 dark:text-white">Team Access</h2>
                     <p className="mt-1 text-xs text-slate-500">
                       Manage team access and roles.
                     </p>
                   </div>
-                  <span className="rounded-full bg-slate-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                     {members.length} Active
                   </span>
                 </div>
 
                 <form
-                  className="mt-6 flex flex-col gap-3 rounded-[1.8rem] border border-slate-800 bg-slate-900/40 p-4 sm:flex-row"
+                  className="mt-6 flex flex-col gap-3 rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 p-4 sm:flex-row"
                   onSubmit={handleInvite}
                 >
                   <input
@@ -270,7 +270,7 @@ export default function WorkspaceSettingsPage() {
                       setInviteForm((current) => ({ ...current, email: event.target.value }))
                     }
                     disabled={!canInviteMembers}
-                    className="flex-1 rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-brand-500 disabled:opacity-50"
+                    className="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 py-3 text-sm text-slate-900 dark:text-white outline-none transition focus:border-brand-500 disabled:opacity-50"
                     placeholder="teammate@fredocloud.com"
                   />
                   <div className="flex gap-3 sm:w-80">
@@ -279,7 +279,6 @@ export default function WorkspaceSettingsPage() {
                       onChange={(value) => setInviteForm((current) => ({ ...current, role: value }))}
                       options={roleOptions.map(r => ({ label: r, value: r }))}
                       disabled={!canInviteMembers}
-                      variant="dark"
                       className="flex-1"
                     />
                     <button
@@ -301,14 +300,14 @@ export default function WorkspaceSettingsPage() {
                       !(activeWorkspace?.role === "ADMIN" && member.role === "ADMIN");
 
                     return (
-                      <div key={member.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-800/50 bg-white/[0.02] p-4 transition hover:bg-white/[0.04]">
+                      <div key={member.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-white/[0.02] p-4 transition hover:bg-slate-100 dark:hover:bg-white/[0.04]">
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-white truncate">{member.name}</p>
+                          <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{member.name}</p>
                           <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider font-bold mt-0.5">{member.email}</p>
                         </div>
                         <div className="flex items-center gap-3">
                           {isOwner ? (
-                            <span className="rounded-full bg-slate-800 px-3 py-1 text-[9px] font-black tracking-widest text-slate-500 uppercase">
+                            <span className="rounded-full bg-slate-200 dark:bg-slate-800 px-3 py-1 text-[9px] font-black tracking-widest text-slate-500 uppercase">
                               OWNER
                             </span>
                           ) : (
@@ -318,7 +317,6 @@ export default function WorkspaceSettingsPage() {
                                 onChange={(value) => handleRoleChange(member.id, value)}
                                 options={roleOptions.map(r => ({ label: r, value: r }))}
                                 disabled={!canEditMember || loading}
-                                variant="dark"
                               />
                             </div>
                           )}
@@ -338,7 +336,7 @@ export default function WorkspaceSettingsPage() {
               </article>
 
               {invitations.length > 0 && (
-                <article className="rounded-[2rem] border border-slate-800 bg-slate-950 p-6 text-white shadow-lg">
+                <article className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-6 text-slate-950 dark:text-white shadow-lg">
                   <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                     Pending Invitations
                   </h3>
@@ -346,10 +344,10 @@ export default function WorkspaceSettingsPage() {
                     {invitations.map((invitation) => (
                       <div
                         key={invitation.id}
-                        className="flex items-center justify-between rounded-xl border border-slate-800/60 bg-slate-900/40 px-4 py-3 text-xs"
+                        className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800/60 bg-slate-50 dark:bg-slate-900/40 px-4 py-3 text-xs"
                       >
                         <div>
-                          <p className="font-bold text-white">{invitation.email}</p>
+                          <p className="font-bold text-slate-900 dark:text-white">{invitation.email}</p>
                           <p className="mt-1 text-[9px] text-slate-500 uppercase font-bold tracking-wider">
                             Expires {new Date(invitation.expiresAt).toLocaleDateString()}
                           </p>
@@ -366,7 +364,7 @@ export default function WorkspaceSettingsPage() {
           )}
 
           {activeTab === "permissions" && (
-            <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-[2.3rem] border border-slate-800 bg-slate-950 p-8 text-white shadow-xl">
+            <article className="animate-in fade-in slide-in-from-bottom-4 duration-500 rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-8 text-slate-950 dark:text-white shadow-xl">
               <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
                 Role Permissions
               </h3>
@@ -374,9 +372,9 @@ export default function WorkspaceSettingsPage() {
                 {rolePermissions.map((roleEntry) => (
                   <div key={roleEntry.role} className="space-y-3">
                     <div className="flex items-center justify-between px-1">
-                      <h4 className="text-sm font-black uppercase tracking-widest text-white">{roleEntry.role}</h4>
+                      <h4 className="text-sm font-black uppercase tracking-widest text-slate-950 dark:text-white">{roleEntry.role}</h4>
                       {!editableRoles.includes(roleEntry.role) && (
-                        <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-600">
+                        <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           Read Only
                         </span>
                       )}
@@ -385,9 +383,9 @@ export default function WorkspaceSettingsPage() {
                       {roleEntry.permissions.map((permissionEntry) => (
                         <label
                           key={`${roleEntry.role}-${permissionEntry.permission}`}
-                          className="flex cursor-pointer items-center justify-between rounded-xl border border-slate-800/50 bg-slate-900/30 px-4 py-3 text-[11px] transition hover:bg-white/[0.02]"
+                          className="flex cursor-pointer items-center justify-between rounded-xl border border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-slate-900/30 px-4 py-3 text-[11px] transition hover:bg-slate-100 dark:hover:bg-white/[0.02]"
                         >
-                          <span className="font-bold text-slate-400">
+                          <span className="font-bold text-slate-700 dark:text-slate-400">
                             {permissionLabels[permissionEntry.permission] || permissionEntry.permission}
                           </span>
                           <input
@@ -401,7 +399,7 @@ export default function WorkspaceSettingsPage() {
                                 permissionEntry.enabled
                               )
                             }
-                            className="h-4 w-4 rounded border-slate-800 bg-slate-900 text-brand-500 focus:ring-brand-500 focus:ring-offset-slate-950"
+                            className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-brand-500 focus:ring-brand-500 focus:ring-offset-white dark:focus:ring-offset-slate-950"
                           />
                         </label>
                       ))}
