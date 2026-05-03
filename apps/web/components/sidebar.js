@@ -26,8 +26,8 @@ const navItems = [
   { href: "/goals", label: "Goals", icon: Target },
   { href: "/action-items", label: "Action Items", icon: CheckSquare },
   { href: "/announcements", label: "Announcements", icon: Megaphone },
-  { href: "/settings/profile", label: "Profile", icon: UserCircle },
-  { href: "/settings/workspace", label: "Workspace", icon: Settings }
+  { href: "/settings/workspace", label: "Workspace", icon: Settings },
+  { href: "/settings/profile", label: "Profile", icon: UserCircle }
 ];
 
 function initials(name) {
