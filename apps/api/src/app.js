@@ -1,6 +1,7 @@
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
 const { actionItemRouter } = require("./routes/action-item.routes");
 const { analyticsRouter } = require("./routes/analytics.routes");
 const { announcementRouter } = require("./routes/announcement.routes");
@@ -10,8 +11,10 @@ const { notificationRouter } = require("./routes/notification.routes");
 const { uploadRouter } = require("./routes/upload.routes");
 const { workspaceRouter } = require("./routes/workspace.routes");
 const { env } = require("./config/env");
+const { buildOpenApiSpec } = require("./docs/openapi");
 
 const app = express();
+const openApiSpec = buildOpenApiSpec();
 
 app.use(
   cors({
@@ -29,6 +32,19 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+app.get("/api/openapi.json", (req, res) => {
+  res.status(200).json(openApiSpec);
+});
+
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(openApiSpec, {
+    explorer: true,
+    customSiteTitle: "FredoCloud API Docs"
+  })
+);
 
 app.use("/api/action-items", actionItemRouter);
 app.use("/api/analytics", analyticsRouter);
