@@ -35,6 +35,7 @@ export const useActionItemStore = create((set, get) => ({
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
+  resetWorkspaceData: () => set({ actionItems: [], selectedIds: [], error: null }),
   applySocketActionItem: (nextActionItem) =>
     set((state) => ({
       actionItems: state.actionItems.some((actionItem) => actionItem.id === nextActionItem.id)

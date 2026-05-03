@@ -23,6 +23,7 @@ export const useGoalStore = create((set, get) => ({
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
+  resetWorkspaceData: () => set({ goals: [], currentGoal: null, error: null }),
   fetchGoals: async (filters) => {
     if (get().goals.length > 0 && get().goals[0].workspaceId !== filters.workspaceId) {
       set({ goals: [], loading: true, error: null });

@@ -1,7 +1,10 @@
 "use client";
 
 import { apiRequest } from "@/lib/api-client";
+import { useActionItemStore } from "@/stores/action-item-store";
+import { useAnnouncementStore } from "@/stores/announcement-store";
 import { useAuthStore } from "@/stores/auth-store";
+import { useGoalStore } from "@/stores/goal-store";
 import { create } from "zustand";
 
 function syncActiveWorkspace(workspaces, activeWorkspaceId) {
@@ -73,9 +76,13 @@ export const useWorkspaceStore = create((set, get) => ({
   setActiveWorkspace: async (workspaceId) => {
     const nextActiveWorkspace = get().workspaces.find((workspace) => workspace.id === workspaceId);
 
-    if (!nextActiveWorkspace) {
+    if (!nextActiveWorkspace || nextActiveWorkspace.id === get().activeWorkspaceId) {
       return;
     }
+
+    useGoalStore.getState().resetWorkspaceData();
+    useActionItemStore.getState().resetWorkspaceData();
+    useAnnouncementStore.getState().resetWorkspaceData();
 
     set({
       activeWorkspaceId: nextActiveWorkspace.id,
@@ -98,6 +105,12 @@ export const useWorkspaceStore = create((set, get) => ({
       const payload = await apiRequest("/api/workspaces");
       const nextState = syncActiveWorkspace(payload.workspaces, get().activeWorkspaceId);
       const workspaceChanged = nextState.activeWorkspaceId !== get().activeWorkspaceId;
+
+      if (workspaceChanged) {
+        useGoalStore.getState().resetWorkspaceData();
+        useActionItemStore.getState().resetWorkspaceData();
+        useAnnouncementStore.getState().resetWorkspaceData();
+      }
 
       set({
         workspaces: payload.workspaces,
@@ -285,6 +298,12 @@ export const useWorkspaceStore = create((set, get) => ({
 
       const nextWorkspaces = get().workspaces.filter((workspace) => workspace.id !== workspaceId);
       const nextState = syncActiveWorkspace(nextWorkspaces, get().activeWorkspaceId);
+
+      if (nextState.activeWorkspaceId !== get().activeWorkspaceId) {
+        useGoalStore.getState().resetWorkspaceData();
+        useActionItemStore.getState().resetWorkspaceData();
+        useAnnouncementStore.getState().resetWorkspaceData();
+      }
 
       set({
         workspaces: nextWorkspaces,

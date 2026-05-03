@@ -131,6 +131,7 @@ export const useAnnouncementStore = create((set, get) => ({
   loading: false,
   error: null,
   clearError: () => set({ error: null }),
+  resetWorkspaceData: () => set({ announcements: [], currentAnnouncement: null, comments: [], error: null }),
   applySocketAnnouncement: (announcement) =>
     set((state) => {
       const exists = state.announcements.some((entry) => entry.id === announcement.id);
