@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CustomSelect } from "@/components/ui/select";
 
 const emptyMilestone = {
   title: "",
@@ -111,20 +112,14 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Owner</span>
-              <select
+              <CustomSelect
                 value={form.assigneeId}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, assigneeId: event.target.value }))
-                }
-                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
-              >
-                <option value="">Unassigned</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, assigneeId: value }))}
+                options={[
+                  { value: "", label: "Unassigned" },
+                  ...members.map((m) => ({ value: m.id, label: m.name }))
+                ]}
+              />
             </label>
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Due date</span>
@@ -139,31 +134,29 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Status</span>
-              <select
+              <CustomSelect
                 value={form.status}
-                onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
-              >
-                <option value="NOT_STARTED">Not Started</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="COMPLETED">Completed</option>
-                <option value="ON_HOLD">On Hold</option>
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, status: value }))}
+                options={[
+                  { value: "NOT_STARTED", label: "Not Started" },
+                  { value: "IN_PROGRESS", label: "In Progress" },
+                  { value: "COMPLETED", label: "Completed" },
+                  { value: "ON_HOLD", label: "On Hold" }
+                ]}
+              />
             </label>
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</span>
-              <select
+              <CustomSelect
                 value={form.priority}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, priority: event.target.value }))
-                }
-                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
-              >
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
-                <option value="URGENT">Urgent</option>
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, priority: value }))}
+                options={[
+                  { value: "LOW", label: "Low" },
+                  { value: "MEDIUM", label: "Medium" },
+                  { value: "HIGH", label: "High" },
+                  { value: "URGENT", label: "Urgent" }
+                ]}
+              />
             </label>
           </div>
           {!initialValues ? (

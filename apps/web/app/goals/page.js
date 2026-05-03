@@ -10,6 +10,7 @@ import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 import { DashboardSkeleton } from "@/components/ui/skeleton";
+import { CustomSelect } from "@/components/ui/select";
 
 function formatDate(value) {
   if (!value) {
@@ -104,34 +105,28 @@ export default function GoalsPage() {
         <section className="grid gap-4 rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm md:grid-cols-3">
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Status</span>
-            <select
+            <CustomSelect
               value={filters.status}
-              onChange={(event) => setFilters((current) => ({ ...current, status: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
-            >
-              <option value="">All statuses</option>
-              <option value="NOT_STARTED">Not Started</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="ON_HOLD">On Hold</option>
-            </select>
+              onChange={(value) => setFilters((current) => ({ ...current, status: value }))}
+              options={[
+                { value: "", label: "All statuses" },
+                { value: "NOT_STARTED", label: "Not Started" },
+                { value: "IN_PROGRESS", label: "In Progress" },
+                { value: "COMPLETED", label: "Completed" },
+                { value: "ON_HOLD", label: "On Hold" }
+              ]}
+            />
           </label>
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Owner</span>
-            <select
+            <CustomSelect
               value={filters.assigneeId}
-              onChange={(event) =>
-                setFilters((current) => ({ ...current, assigneeId: event.target.value }))
-              }
-              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
-            >
-              <option value="">All owners</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
+              onChange={(value) => setFilters((current) => ({ ...current, assigneeId: value }))}
+              options={[
+                { value: "", label: "All owners" },
+                ...members.map((m) => ({ value: m.id, label: m.name }))
+              ]}
+            />
           </label>
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Search</span>
