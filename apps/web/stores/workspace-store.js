@@ -271,6 +271,41 @@ export const useWorkspaceStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  deleteWorkspace: async (workspaceId) => {
+    set({ loading: true, error: null });
+
+    try {
+      await apiRequest(`/api/workspaces/${workspaceId}`, {
+        method: "DELETE"
+      });
+
+      const nextWorkspaces = get().workspaces.filter((workspace) => workspace.id !== workspaceId);
+      const nextState = syncActiveWorkspace(nextWorkspaces, get().activeWorkspaceId);
+
+      set({
+        workspaces: nextWorkspaces,
+        ...nextState,
+        members: [],
+        invitations: [],
+        rolePermissions: [],
+        error: null
+      });
+
+      await useAuthStore.getState().fetchMe({ silent: true }).catch(() => {});
+
+      if (nextState.activeWorkspaceId) {
+        await Promise.all([
+          get().fetchMembers(nextState.activeWorkspaceId, { silent: true }),
+          get().fetchPermissions(nextState.activeWorkspaceId, { silent: true })
+        ]);
+      }
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
   inviteMember: async (workspaceId, values) => {
     set({ loading: true, error: null });
 

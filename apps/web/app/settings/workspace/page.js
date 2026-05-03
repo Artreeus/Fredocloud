@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { hasPermission } from "@/lib/permissions";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { useAuthStore } from "@/stores/auth-store";
@@ -40,6 +41,7 @@ const visiblePermissionsByRole = {
 };
 
 export default function WorkspaceSettingsPage() {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
@@ -49,6 +51,7 @@ export default function WorkspaceSettingsPage() {
   const error = useWorkspaceStore((state) => state.error);
   const clearError = useWorkspaceStore((state) => state.clearError);
   const updateWorkspace = useWorkspaceStore((state) => state.updateWorkspace);
+  const deleteWorkspace = useWorkspaceStore((state) => state.deleteWorkspace);
   const inviteMember = useWorkspaceStore((state) => state.inviteMember);
   const updateMemberRole = useWorkspaceStore((state) => state.updateMemberRole);
   const removeMember = useWorkspaceStore((state) => state.removeMember);
@@ -131,6 +134,24 @@ export default function WorkspaceSettingsPage() {
 
     await updateRolePermissions(activeWorkspace.id, role, nextPermissions);
     pushToast({ type: "success", message: `${role} permissions updated.` });
+  }
+
+  async function handleDeleteWorkspace() {
+    if (!activeWorkspace) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete "${activeWorkspace.name}"? This removes the workspace and its related data permanently.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteWorkspace(activeWorkspace.id);
+    pushToast({ type: "success", message: "Workspace deleted." });
+    router.push("/dashboard");
   }
 
   return (
@@ -254,6 +275,25 @@ export default function WorkspaceSettingsPage() {
                     "Save changes"
                   )}
                 </button>
+
+                {canManageWorkspace ? (
+                  <div className="rounded-[2rem] border border-rose-200 bg-rose-50/80 px-6 py-5 dark:border-rose-900/40 dark:bg-rose-950/20">
+                    <p className="text-sm font-black uppercase tracking-[0.2em] text-rose-700 dark:text-rose-300">
+                      Danger zone
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-rose-700/80 dark:text-rose-300/80">
+                      Deleting a workspace removes its goals, announcements, action items, and membership data.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleDeleteWorkspace}
+                      disabled={loading}
+                      className="mt-5 rounded-2xl border border-rose-300 bg-white px-6 py-3 text-sm font-black uppercase tracking-widest text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-900/50 dark:bg-rose-950/10 dark:text-rose-300 dark:hover:bg-rose-950/30"
+                    >
+                      Delete workspace
+                    </button>
+                  </div>
+                ) : null}
               </form>
             </article>
           )}
