@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -143,10 +144,22 @@ export function TopNav() {
     <header className="sticky top-0 z-20 px-4 pt-4">
       <div className="mx-auto flex w-full max-w-[1200px] flex-wrap items-center justify-between gap-4 rounded-[2rem] border border-white/60 bg-white/78 px-4 py-4 shadow-soft backdrop-blur-xl sm:px-5">
         <div className="flex min-w-0 items-center gap-4 lg:gap-6">
-          <Link href="/dashboard" className="flex flex-col leading-none">
-            <span className="font-display text-xl text-slate-950">FredoCloud</span>
-            <span className="mt-1 text-[10px] uppercase tracking-[0.32em] text-slate-500">
-              Team Hub
+          <Link href="/dashboard" className="flex items-center gap-3 leading-none">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80">
+              <Image
+                src="/brand-icon.png"
+                alt="FredoCloud"
+                width={44}
+                height={44}
+                className="h-11 w-11 object-cover"
+                priority
+              />
+            </span>
+            <span className="flex flex-col leading-none">
+              <span className="font-display text-xl text-slate-950">FredoCloud</span>
+              <span className="mt-1 text-[10px] uppercase tracking-[0.32em] text-slate-500">
+                Team Hub
+              </span>
             </span>
           </Link>
           <nav className="hidden items-center gap-1 xl:flex">

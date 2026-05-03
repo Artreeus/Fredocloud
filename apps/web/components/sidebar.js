@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -150,7 +151,16 @@ export function Sidebar() {
       <div className="flex h-24 shrink-0 items-center justify-between px-6">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="relative">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-slate-950 dark:bg-brand-600 font-display font-black text-white shadow-lg ring-1 ring-white/20">F</span>
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-white/10">
+              <Image
+                src="/brand-icon.png"
+                alt="FredoCloud"
+                width={44}
+                height={44}
+                className="h-11 w-11 object-cover"
+                priority
+              />
+            </span>
             <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-brand-500 ring-2 ring-white dark:ring-slate-950" />
           </div>
           <div className="flex flex-col leading-none">
