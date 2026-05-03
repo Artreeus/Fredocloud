@@ -23,6 +23,7 @@ const accentOptions = ["#10212b", "#c96f4a", "#58715d", "#863b29", "#1e293b"];
 export default function DashboardPage() {
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const workspaces = useWorkspaceStore((state) => state.workspaces);
+  const onlineUserIds = useWorkspaceStore((state) => state.onlineUserIds);
   const pendingInvitations = useWorkspaceStore((state) => state.pendingInvitations);
   const loading = useWorkspaceStore((state) => state.loading);
   const error = useWorkspaceStore((state) => state.error);
@@ -270,7 +271,7 @@ export default function DashboardPage() {
                   </p>
                 </div>
                 <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Completed this week</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Tasks completed this week</p>
                   <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
                     {analytics?.stats?.completedThisWeek ?? "--"}
                   </p>
@@ -284,7 +285,7 @@ export default function DashboardPage() {
                 <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Active members</p>
                   <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
-                    {analytics?.stats?.activeMembers ?? "--"}
+                    {onlineUserIds.length > 0 ? onlineUserIds.length : (analytics?.stats?.activeMembers ?? "--")}
                     <span className="ml-2 text-sm font-medium text-slate-500">
                       / {analytics?.stats?.totalMembers ?? "--"}
                     </span>

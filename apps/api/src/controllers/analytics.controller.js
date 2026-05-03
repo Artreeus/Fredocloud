@@ -36,6 +36,7 @@ async function getAnalyticsSummary(req, res, next) {
           id: true,
           status: true,
           createdAt: true,
+          updatedAt: true,
           completedAt: true
         },
         orderBy: { createdAt: "asc" }
@@ -82,7 +83,7 @@ async function getAnalyticsSummary(req, res, next) {
             return false;
           }
 
-          const completedAt = goal.completedAt ? new Date(goal.completedAt) : new Date(goal.createdAt);
+          const completedAt = goal.completedAt ? new Date(goal.completedAt) : new Date(goal.updatedAt || goal.createdAt);
           return completedAt >= bucketDate && completedAt < nextBucketDate;
         }).length
       };
@@ -90,7 +91,7 @@ async function getAnalyticsSummary(req, res, next) {
 
     const priorityDistribution = Object.values(Priority).map((priority) => ({
       name: priority,
-      value: actionItems.filter((item) => item.priority === priority).length
+      value: actionItems.filter((item) => item.priority === priority && item.status !== ActionItemStatus.DONE).length
     }));
 
     return res.status(200).json({
