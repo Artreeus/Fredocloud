@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader } from "@/components/ui/loader";
-import { TopNav } from "@/components/top-nav";
+import { Sidebar } from "@/components/sidebar";
 import { WorkspaceRealtimeBridge } from "@/components/workspace-realtime-bridge";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
@@ -55,15 +55,21 @@ export function ProtectedLayout({ children }) {
 
   return (
     <div
-      className="min-h-screen"
+      className="flex min-h-screen bg-canvas dark:bg-slate-950 transition-colors duration-300"
       style={{
-        "--workspace-accent": activeWorkspace?.accentColor || "#2745f2"
+        "--workspace-accent": activeWorkspace?.accentColor || "#10212b"
       }}
     >
-      <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)]" />
       <WorkspaceRealtimeBridge workspaceId={activeWorkspace?.id} />
-      <TopNav />
-      <main className="relative mx-auto w-full max-w-[1200px] px-6 py-10">{children}</main>
+      
+      {/* Sidebar fixed to the left */}
+      <Sidebar />
+      
+      {/* Main content area, offset by the sidebar width (72 = 18rem) */}
+      <div className="flex flex-1 flex-col pl-72">
+        <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.03),transparent_62%)]" />
+        <main className="relative mx-auto w-full max-w-[1200px] px-8 py-12">{children}</main>
+      </div>
     </div>
   );
 }
