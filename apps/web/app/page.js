@@ -367,53 +367,6 @@ export default function HomePage() {
             ))}
           </div>
         </motion.section>
-
-        {/* --- NEW SECTION 3: Pricing --- */}
-        <motion.section 
-          className="mt-32 mb-20 scroll-mt-24"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          variants={staggerContainer}
-        >
-          <motion.div variants={fadeUpVariants} className="text-center mb-16">
-            <h2 className="font-display text-3xl font-medium text-slate-950 dark:text-white sm:text-4xl">
-              Simple, transparent pricing
-            </h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
-              Start for free, upgrade when you need to.
-            </p>
-          </motion.div>
-          <div className="grid md:grid-cols-2 max-w-4xl mx-auto gap-8">
-            <motion.div variants={fadeUpVariants} className="rounded-3xl border border-white/60 bg-white/60 p-10 shadow-sm backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-900/60">
-              <h3 className="text-2xl font-bold text-slate-950 dark:text-white mb-2">Starter</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">Perfect for small teams finding their rhythm.</p>
-              <div className="mb-6"><span className="text-4xl font-bold text-slate-950 dark:text-white">$0</span> <span className="text-slate-500">/ forever</span></div>
-              <ul className="space-y-4 mb-8 text-slate-700 dark:text-slate-300">
-                <li className="flex items-center gap-3">✅ Up to 5 members</li>
-                <li className="flex items-center gap-3">✅ Unlimited tasks</li>
-                <li className="flex items-center gap-3">✅ 3 active goals</li>
-              </ul>
-              <Link href="/register" className="block w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-center font-bold rounded-xl transition">
-                Get Started
-              </Link>
-            </motion.div>
-            <motion.div variants={fadeUpVariants} className="rounded-3xl border-2 border-brand-500 bg-white/60 p-10 shadow-lg backdrop-blur-xl dark:bg-slate-900/60 relative">
-              <div className="absolute top-0 right-8 -translate-y-1/2 bg-brand-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-widest">Most Popular</div>
-              <h3 className="text-2xl font-bold text-slate-950 dark:text-white mb-2">Pro</h3>
-              <p className="text-slate-600 dark:text-slate-400 mb-6">For scaling teams that need more power.</p>
-              <div className="mb-6"><span className="text-4xl font-bold text-slate-950 dark:text-white">$12</span> <span className="text-slate-500">/ user / month</span></div>
-              <ul className="space-y-4 mb-8 text-slate-700 dark:text-slate-300">
-                <li className="flex items-center gap-3">✅ Unlimited members</li>
-                <li className="flex items-center gap-3">✅ Unlimited goals</li>
-                <li className="flex items-center gap-3">✅ Advanced analytics</li>
-              </ul>
-              <Link href="/register" className="block w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white text-center font-bold rounded-xl transition shadow-glow">
-                Start Free Trial
-              </Link>
-            </motion.div>
-          </div>
-        </motion.section>
       </main>
 
       <footer className="border-t border-slate-200/50 bg-white/30 px-6 py-12 backdrop-blur-md dark:border-slate-800/50 dark:bg-slate-950/30">
