@@ -68,7 +68,7 @@ export function ProtectedLayout({ children }) {
       {/* Main content area, offset by the sidebar width (72 = 18rem) */}
       <div className="flex flex-1 flex-col pl-72">
         <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.03),transparent_62%)]" />
-        <main className="relative mx-auto w-full max-w-[1200px] px-8 py-12">{children}</main>
+        <main className="relative mx-auto w-full max-w-[1440px] px-10 py-12">{children}</main>
       </div>
     </div>
   );
