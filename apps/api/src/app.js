@@ -25,6 +25,17 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.status(200).json({
+    service: "FredoCloud API",
+    status: "online",
+    docs: "/api/docs",
+    openApi: "/api/openapi.json",
+    health: "/api/health",
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get("/api/health", (req, res) => {
   res.status(200).json({
     status: "ok",
