@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "framer-motion";
 
@@ -23,7 +24,16 @@ export function AuthFormShell({ title, subtitle, children, footer, eyebrow = "Fr
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-950 dark:bg-brand-500 font-display font-bold text-white shadow-sm">F</span>
+              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-white/10">
+                <Image
+                  src="/brand-icon.png"
+                  alt="FredoCloud"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 object-cover"
+                  priority
+                />
+              </span>
               <span className="hidden font-display text-lg font-bold tracking-tight text-slate-950 dark:text-white sm:block">FredoCloud</span>
             </div>
           </div>
