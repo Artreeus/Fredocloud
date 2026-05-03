@@ -21,6 +21,29 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const getPasswordStrength = (password) => {
+    if (!password) return null;
+    let score = 0;
+    if (password.length >= 8) score += 1;
+    if (/[A-Z]/.test(password)) score += 1;
+    if (/[0-9]/.test(password)) score += 1;
+    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    if (password.length >= 12) score += 1;
+
+    const finalScore = Math.min(4, Math.max(1, score));
+
+    const strengths = {
+      1: { label: "Weak", color: "bg-rose-500", textColor: "text-rose-500", width: "w-1/4" },
+      2: { label: "Fair", color: "bg-amber-500", textColor: "text-amber-500", width: "w-2/4" },
+      3: { label: "Good", color: "bg-brand-500", textColor: "text-brand-500", width: "w-3/4" },
+      4: { label: "Strong", color: "bg-emerald-500", textColor: "text-emerald-500", width: "w-full" }
+    };
+
+    return strengths[finalScore];
+  };
+
+  const strength = getPasswordStrength(form.password);
+
   async function handleSubmit(event) {
     event.preventDefault();
     setLocalError("");
@@ -128,6 +151,19 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
+          {strength && (
+            <div className="pt-1 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-300">
+              <div className="flex h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+                <div 
+                  className={`h-full rounded-full transition-all duration-300 ${strength.color} ${strength.width}`} 
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
+                <span className="text-slate-500">Password strength</span>
+                <span className={strength.textColor}>{strength.label}</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
