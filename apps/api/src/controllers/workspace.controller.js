@@ -5,6 +5,7 @@ const { prisma } = require("../lib/prisma");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const {
   assertWorkspacePermission,
+  ensureWorkspaceRolePermissions,
   getPermissionsForRole,
   getWorkspacePermissionsOrThrow,
   syncWorkspaceRolePermissions
@@ -68,7 +69,7 @@ async function listWorkspaces(req, res, next) {
 
     await Promise.all(
       [...new Set(existingMemberships.map((membership) => membership.workspaceId))].map((workspaceId) =>
-        syncWorkspaceRolePermissions(prisma, workspaceId)
+        ensureWorkspaceRolePermissions(prisma, workspaceId)
       )
     );
 

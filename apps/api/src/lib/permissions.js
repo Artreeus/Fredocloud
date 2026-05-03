@@ -3,6 +3,12 @@ const { prisma } = require("./prisma");
 const { createError, getWorkspaceMembershipOrThrow } = require("./workspaces");
 
 const allPermissions = Object.values(Permission);
+const globalForPermissionSync = globalThis;
+const permissionSyncCache = globalForPermissionSync.__fredocloudPermissionSyncCache || new Set();
+
+if (!globalForPermissionSync.__fredocloudPermissionSyncCache) {
+  globalForPermissionSync.__fredocloudPermissionSyncCache = permissionSyncCache;
+}
 
 const defaultRolePermissions = {
   [WorkspaceRole.OWNER]: allPermissions,
@@ -56,9 +62,30 @@ async function syncWorkspaceRolePermissions(db, workspaceId) {
     data: createPayload,
     skipDuplicates: true
   });
+
+  permissionSyncCache.add(workspaceId);
+}
+
+async function ensureWorkspaceRolePermissions(db, workspaceId) {
+  if (!workspaceId || permissionSyncCache.has(workspaceId)) {
+    return;
+  }
+
+  const existingPermission = await db.workspaceRolePermission.findFirst({
+    where: { workspaceId },
+    select: { workspaceId: true }
+  });
+
+  if (!existingPermission) {
+    await syncWorkspaceRolePermissions(db, workspaceId);
+    return;
+  }
+
+  permissionSyncCache.add(workspaceId);
 }
 
 async function getWorkspacePermissionsOrThrow(workspaceId, userId) {
+  await ensureWorkspaceRolePermissions(prisma, workspaceId);
   await getWorkspaceMembershipOrThrow(workspaceId, userId);
   const rolePermissions = await prisma.workspaceRolePermission.findMany({
     where: { workspaceId },
@@ -69,7 +96,7 @@ async function getWorkspacePermissionsOrThrow(workspaceId, userId) {
 }
 
 async function getWorkspaceMembershipWithPermissionsOrThrow(workspaceId, userId) {
-  await syncWorkspaceRolePermissions(prisma, workspaceId);
+  await ensureWorkspaceRolePermissions(prisma, workspaceId);
 
   const membership = await prisma.workspaceMember.findUnique({
     where: {
@@ -118,6 +145,7 @@ module.exports = {
   assertWorkspacePermission,
   buildRolePermissionMatrix,
   defaultRolePermissions,
+  ensureWorkspaceRolePermissions,
   getPermissionsForRole,
   getWorkspaceMembershipWithPermissionsOrThrow,
   getWorkspacePermissionsOrThrow,

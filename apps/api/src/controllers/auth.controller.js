@@ -12,7 +12,7 @@ const {
   signRefreshToken,
   verifyRefreshToken
 } = require("../lib/auth");
-const { syncWorkspaceRolePermissions } = require("../lib/permissions");
+const { ensureWorkspaceRolePermissions, syncWorkspaceRolePermissions } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
 
 function createError(message, statusCode) {
@@ -42,7 +42,7 @@ async function fetchUserProfile(userId) {
 
   await Promise.all(
     [...new Set(memberships.map((membership) => membership.workspaceId))].map((workspaceId) =>
-      syncWorkspaceRolePermissions(prisma, workspaceId)
+      ensureWorkspaceRolePermissions(prisma, workspaceId)
     )
   );
 
