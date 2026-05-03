@@ -642,6 +642,25 @@ function milestoneStatus(progress) {
   return "NOT_STARTED";
 }
 
+async function cleanup() {
+  console.log("Cleaning up existing data...");
+  await prisma.auditLog.deleteMany();
+  await prisma.notification.deleteMany();
+  await prisma.actionItem.deleteMany();
+  await prisma.reaction.deleteMany();
+  await prisma.comment.deleteMany();
+  await prisma.goalUpdate.deleteMany();
+  await prisma.milestone.deleteMany();
+  await prisma.goal.deleteMany();
+  await prisma.announcement.deleteMany();
+  await prisma.workspaceInvite.deleteMany();
+  await prisma.workspaceRolePermission.deleteMany();
+  await prisma.workspaceMember.deleteMany();
+  await prisma.workspace.deleteMany();
+  await prisma.user.deleteMany();
+  console.log("Cleanup complete.");
+}
+
 async function upsertUser(user, passwordHash) {
   return prisma.user.upsert({
     where: { email: user.email },
@@ -877,6 +896,7 @@ async function upsertAuditLogs(workspace) {
 }
 
 async function main() {
+  await cleanup();
   const passwordHash = await bcrypt.hash(demoPassword, 12);
 
   for (const user of users) {
