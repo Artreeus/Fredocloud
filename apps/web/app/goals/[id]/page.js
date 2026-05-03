@@ -15,7 +15,7 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString();
 }
 
-function MilestoneSlider({ milestone, canUpdateGoal, activeWorkspace, onChangeEnd }) {
+function MilestoneSlider({ milestone, canUpdateGoal, onChangeEnd }) {
   const [value, setValue] = useState(milestone.progress);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ function MilestoneSlider({ milestone, canUpdateGoal, activeWorkspace, onChangeEn
         onChange={(event) => setValue(Number(event.target.value))}
         onMouseUp={handleEnd}
         onTouchEnd={handleEnd}
-        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 dark:bg-slate-700 accent-[var(--workspace-accent)]"
+        className="h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 dark:bg-slate-700 accent-slate-950 dark:accent-brand-500"
       />
       <span className="min-w-10 text-right text-sm font-bold text-slate-700 dark:text-slate-300">
         {value}%
@@ -136,8 +136,7 @@ export default function GoalDetailPage({ params }) {
                   <button
                     type="button"
                     onClick={() => setShowEditModal(true)}
-                    className="rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
-                    style={{ backgroundColor: activeWorkspace?.accentColor || "#10212b" }}
+                    className="rounded-full bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
                   >
                     Edit goal
                   </button>
@@ -163,11 +162,8 @@ export default function GoalDetailPage({ params }) {
 
               <div className="mt-6 h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                 <div
-                  className="h-full rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: `${goal.progress}%`,
-                    backgroundColor: activeWorkspace?.accentColor || "#10212b"
-                  }}
+                  className="h-full rounded-full bg-slate-950 dark:bg-brand-500 transition-all duration-1000 ease-out"
+                  style={{ width: `${goal.progress}%` }}
                 />
               </div>
             </section>
@@ -200,7 +196,6 @@ export default function GoalDetailPage({ params }) {
                         <MilestoneSlider
                           milestone={milestone}
                           canUpdateGoal={canUpdateGoal}
-                          activeWorkspace={activeWorkspace}
                           onChangeEnd={handleMilestoneProgressChange}
                         />
                       </div>
@@ -246,8 +241,7 @@ export default function GoalDetailPage({ params }) {
                   <button
                     type="submit"
                     disabled={loading || !canUpdateGoal}
-                    className="rounded-2xl px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-                    style={{ backgroundColor: activeWorkspace?.accentColor || "#10212b" }}
+                    className="rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Add milestone
                   </button>
@@ -274,8 +268,7 @@ export default function GoalDetailPage({ params }) {
                 <button
                   type="submit"
                   disabled={loading || !canUpdateGoal}
-                  className="rounded-2xl px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
-                  style={{ backgroundColor: activeWorkspace?.accentColor || "#10212b" }}
+                  className="rounded-2xl bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Post update
                 </button>

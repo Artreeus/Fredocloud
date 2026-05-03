@@ -87,12 +87,11 @@ export default function GoalsPage() {
             </p>
           </div>
           {canCreateGoal ? (
-            <button
-              type="button"
-              onClick={() => setShowCreateModal(true)}
-              className="rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
-              style={{ backgroundColor: activeWorkspace?.accentColor || "#10212b" }}
-            >
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="rounded-full bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
+              >
               Create goal
             </button>
           ) : (
@@ -202,11 +201,8 @@ export default function GoalsPage() {
                     </div>
                     <div className="h-2.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                       <div
-                        className="h-full rounded-full transition-all duration-1000 ease-out"
-                        style={{
-                          width: `${goal.progress}%`,
-                          backgroundColor: activeWorkspace?.accentColor || "#10212b"
-                        }}
+                        className="h-full rounded-full bg-slate-950 dark:bg-brand-500 transition-all duration-1000 ease-out"
+                        style={{ width: `${goal.progress}%` }}
                       />
                     </div>
                   </div>

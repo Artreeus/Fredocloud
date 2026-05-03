@@ -113,8 +113,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setShowCreateForm((current) => !current)}
-              className="rounded-full px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:opacity-90"
-              style={{ backgroundColor: activeWorkspace?.accentColor || "#10212b" }}
+              className="rounded-full bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
             >
               {showCreateForm ? "Close form" : "Create workspace"}
             </button>
@@ -297,7 +296,7 @@ export default function DashboardPage() {
                     <YAxis allowDecimals={false} stroke="#64748b" />
                     <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '1rem', color: '#f8fafc' }} />
                     <Bar dataKey="totalGoals" fill="#cbd5e1" radius={[10, 10, 0, 0]} />
-                    <Bar dataKey="completedGoals" fill={activeWorkspace?.accentColor || "#10212b"} radius={[10, 10, 0, 0]} />
+                    <Bar dataKey="completedGoals" fill="#3e73c5" radius={[10, 10, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
