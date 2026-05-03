@@ -39,7 +39,7 @@ export function ProtectedLayout({ children }) {
     }
   }, [bootstrap, user]);
 
-  if (!hydrated || loading || !user || !workspaceInitialized || workspaceLoading) {
+  if (!hydrated || loading || !user || !workspaceInitialized) {
     return (
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 bg-canvas dark:bg-slate-950 transition-colors duration-300">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.1),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(88,113,93,0.1),transparent_30%)]" />
