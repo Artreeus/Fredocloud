@@ -68,6 +68,9 @@ export default function WorkspaceSettingsPage() {
     email: "",
     role: "MEMBER"
   });
+  const [removingMemberId, setRemovingMemberId] = useState(null);
+  const [updatingMemberId, setUpdatingMemberId] = useState(null);
+  const [updatingPermissionId, setUpdatingPermissionId] = useState(null);
 
   useEffect(() => {
     if (activeWorkspace) {
@@ -108,32 +111,55 @@ export default function WorkspaceSettingsPage() {
   }
 
   async function handleRoleChange(memberId, role) {
-    await updateMemberRole(activeWorkspace.id, memberId, role);
-    pushToast({ type: "success", message: "Member role updated." });
+    setUpdatingMemberId(memberId);
+    try {
+      await updateMemberRole(activeWorkspace.id, memberId, role);
+      pushToast({ type: "success", message: "Member role updated." });
+    } catch (err) {
+      pushToast({ type: "error", message: err.message });
+    } finally {
+      setUpdatingMemberId(null);
+    }
   }
 
   async function handleRemove(memberId) {
-    await removeMember(activeWorkspace.id, memberId);
-    pushToast({ type: "success", message: "Member removed." });
+    setRemovingMemberId(memberId);
+    try {
+      await removeMember(activeWorkspace.id, memberId);
+      pushToast({ type: "success", message: "Member removed." });
+    } catch (err) {
+      pushToast({ type: "error", message: err.message });
+    } finally {
+      setRemovingMemberId(null);
+    }
   }
 
   async function handlePermissionToggle(role, permission, enabled) {
-    const currentRolePermissions =
-      rolePermissions.find((entry) => entry.role === role)?.permissions || [];
-    const nextPermissions = enabled
-      ? currentRolePermissions
-          .filter((entry) => entry.enabled)
-          .map((entry) => entry.permission)
-          .filter((entryPermission) => entryPermission !== permission)
-      : [
-          ...currentRolePermissions
+    const permissionId = `${role}-${permission}`;
+    setUpdatingPermissionId(permissionId);
+    
+    try {
+      const currentRolePermissions =
+        rolePermissions.find((entry) => entry.role === role)?.permissions || [];
+      const nextPermissions = enabled
+        ? currentRolePermissions
             .filter((entry) => entry.enabled)
-            .map((entry) => entry.permission),
-          permission
-        ];
+            .map((entry) => entry.permission)
+            .filter((entryPermission) => entryPermission !== permission)
+        : [
+            ...currentRolePermissions
+              .filter((entry) => entry.enabled)
+              .map((entry) => entry.permission),
+            permission
+          ];
 
-    await updateRolePermissions(activeWorkspace.id, role, nextPermissions);
-    pushToast({ type: "success", message: `${role} permissions updated.` });
+      await updateRolePermissions(activeWorkspace.id, role, nextPermissions);
+      pushToast({ type: "success", message: `${role} permissions updated.` });
+    } catch (err) {
+      pushToast({ type: "error", message: err.message });
+    } finally {
+      setUpdatingPermissionId(null);
+    }
   }
 
   async function handleDeleteWorkspace() {
@@ -375,17 +401,17 @@ export default function WorkspaceSettingsPage() {
                                 value={member.role}
                                 onChange={(value) => handleRoleChange(member.id, value)}
                                 options={roleOptions.map(r => ({ label: r, value: r }))}
-                                disabled={!canEditMember || loading}
+                                disabled={!canEditMember || loading || updatingMemberId === member.id}
                               />
                             </div>
                           )}
                           <button
                             type="button"
-                            disabled={!canEditMember || member.id === user?.id || loading}
+                            disabled={!canEditMember || member.id === user?.id || loading || removingMemberId === member.id}
                             onClick={() => handleRemove(member.id)}
-                            className="text-[10px] font-black uppercase tracking-widest text-rose-500/80 transition hover:text-rose-400 disabled:opacity-0 p-2"
+                            className="text-[10px] flex items-center justify-center font-black uppercase tracking-widest text-rose-500/80 transition hover:text-rose-400 disabled:opacity-50 p-2 min-w-[70px]"
                           >
-                            Remove
+                            {removingMemberId === member.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Remove"}
                           </button>
                         </div>
                       </div>
@@ -449,19 +475,23 @@ export default function WorkspaceSettingsPage() {
                           <span className="font-bold text-slate-700 dark:text-slate-400">
                             {permissionLabels[permissionEntry.permission] || permissionEntry.permission}
                           </span>
-                          <input
-                            type="checkbox"
-                            checked={permissionEntry.enabled}
-                            disabled={!canManageMembers || !editableRoles.includes(roleEntry.role) || loading}
-                            onChange={() =>
-                              handlePermissionToggle(
-                                roleEntry.role,
-                                permissionEntry.permission,
-                                permissionEntry.enabled
-                              )
-                            }
-                            className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-brand-500 focus:ring-brand-500 focus:ring-offset-white dark:focus:ring-offset-slate-950"
-                          />
+                          {updatingPermissionId === `${roleEntry.role}-${permissionEntry.permission}` ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-brand-500" />
+                          ) : (
+                            <input
+                              type="checkbox"
+                              checked={permissionEntry.enabled}
+                              disabled={!canManageMembers || !editableRoles.includes(roleEntry.role) || loading}
+                              onChange={() =>
+                                handlePermissionToggle(
+                                  roleEntry.role,
+                                  permissionEntry.permission,
+                                  permissionEntry.enabled
+                                )
+                              }
+                              className="h-4 w-4 rounded border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 text-brand-500 focus:ring-brand-500 focus:ring-offset-white dark:focus:ring-offset-slate-950"
+                            />
+                          )}
                         </label>
                       ))}
                     </div>
