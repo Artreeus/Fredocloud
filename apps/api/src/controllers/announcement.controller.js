@@ -1,5 +1,6 @@
 const { AuditAction, NotificationType, Permission, ReactionType } = require("../../generated/prisma");
 const { assertWorkspacePermission } = require("../lib/permissions");
+const { sendMentionEmail } = require("../lib/email");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
 const { emitWorkspaceEvent } = require("../lib/socket");
@@ -447,6 +448,33 @@ async function createComment(req, res, next) {
           })
         )
       );
+
+      for (const member of validMembers) {
+        const mentionedUser = await prisma.user.findUnique({
+          where: { id: member.userId },
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        });
+
+        if (!mentionedUser?.email) {
+          continue;
+        }
+
+        await sendMentionEmail({
+          toEmail: mentionedUser.email,
+          mentionedUserName: mentionedUser.name,
+          actorName: req.user.name,
+          workspaceName: announcement.workspace.name,
+          announcementTitle: announcement.title,
+          announcementId: announcement.id,
+          commentBody: body
+        }).catch((error) => {
+          console.error("Failed to send mention email", error);
+        });
+      }
     }
 
     const serializedComment = {

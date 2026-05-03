@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const { AuditAction, InvitationStatus, NotificationType, Permission, WorkspaceRole } = require("../../generated/prisma");
 const { slugify } = require("@repo/utils");
 const { prisma } = require("../lib/prisma");
+const { sendWorkspaceInviteEmail } = require("../lib/email");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const {
   assertWorkspacePermission,
@@ -20,14 +21,6 @@ function buildWorkspaceSlug(name) {
   return `${slugify(name) || "workspace"}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
-function isOnline(user) {
-  return Boolean(
-    user.currentRefreshTokenHash &&
-      user.refreshTokenExpiresAt &&
-      new Date(user.refreshTokenExpiresAt) > new Date()
-  );
-}
-
 function serializeWorkspaceMember(membership) {
   return {
     id: membership.user.id,
@@ -37,7 +30,7 @@ function serializeWorkspaceMember(membership) {
     avatarUrl: membership.user.avatarUrl,
     role: membership.role,
     joinedAt: membership.joinedAt,
-    online: isOnline(membership.user)
+    online: false
   };
 }
 
@@ -288,6 +281,17 @@ async function inviteWorkspaceMember(req, res, next) {
         entityId: invite.id
       });
     }
+
+    await sendWorkspaceInviteEmail({
+      toEmail: invite.email,
+      workspaceName: invite.workspace.name,
+      inviterName: req.user.name,
+      role: invite.role,
+      inviteId: invite.id,
+      expiresAt: invite.expiresAt
+    }).catch((error) => {
+      console.error("Failed to send workspace invite email", error);
+    });
 
     return res.status(201).json({
       message: "Invitation created successfully",

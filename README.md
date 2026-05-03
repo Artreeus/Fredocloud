@@ -22,6 +22,7 @@ FredoCloud is a collaborative team workspace built for the internship assignment
 - Action items with Kanban drag-and-drop, list view, filters, and bulk updates
 - Socket.io realtime events for announcements, comments, reactions, action item updates, and presence
 - Notifications with unread badge, dropdown panel, and `@mention` support
+- EmailJS-powered invitation and `@mention` emails
 - Workspace analytics dashboard with Recharts and CSV export
 
 ## Advanced features chosen
@@ -105,6 +106,12 @@ COOKIE_DOMAIN=
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
+EMAILJS_SERVICE_ID=
+EMAILJS_PUBLIC_KEY=
+EMAILJS_PRIVATE_KEY=
+EMAILJS_INVITE_TEMPLATE_ID=
+EMAILJS_MENTION_TEMPLATE_ID=
+APP_NAME=FredoCloud
 ```
 
 ### Frontend `apps/web/.env.local`
@@ -134,6 +141,12 @@ ACCESS_TOKEN_COOKIE_NAME=fredocloud_access_token
   - `CLOUDINARY_CLOUD_NAME`
   - `CLOUDINARY_API_KEY`
   - `CLOUDINARY_API_SECRET`
+  - `EMAILJS_SERVICE_ID`
+  - `EMAILJS_PUBLIC_KEY`
+  - `EMAILJS_PRIVATE_KEY`
+  - `EMAILJS_INVITE_TEMPLATE_ID`
+  - `EMAILJS_MENTION_TEMPLATE_ID`
+  - `APP_NAME`
 - The frontend service expects:
   - `NEXT_PUBLIC_APP_URL`
   - `NEXT_PUBLIC_API_URL`
@@ -179,6 +192,7 @@ ACCESS_TOKEN_COOKIE_NAME=fredocloud_access_token
 
 - Railway PostgreSQL plugin provisioning was blocked by the current free-plan resource limit, so Neon is used as the production database instead.
 - Cloudinary uploads require valid production Cloudinary credentials to be fully testable end to end.
+- EmailJS delivery requires valid invite and mention template IDs in addition to the service/public/private keys.
 - The video walkthrough is still a manual submission step and should be recorded separately.
 
 ## Walkthrough checklist

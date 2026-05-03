@@ -79,7 +79,9 @@ export const useWorkspaceStore = create((set, get) => ({
 
     set({
       activeWorkspaceId: nextActiveWorkspace.id,
-      activeWorkspace: nextActiveWorkspace
+      activeWorkspace: nextActiveWorkspace,
+      onlineUserIds: [],
+      members: []
     });
 
     await Promise.all([
@@ -95,10 +97,12 @@ export const useWorkspaceStore = create((set, get) => ({
     try {
       const payload = await apiRequest("/api/workspaces");
       const nextState = syncActiveWorkspace(payload.workspaces, get().activeWorkspaceId);
+      const workspaceChanged = nextState.activeWorkspaceId !== get().activeWorkspaceId;
 
       set({
         workspaces: payload.workspaces,
         ...nextState,
+        onlineUserIds: workspaceChanged ? [] : get().onlineUserIds,
         initialized: true,
         error: null
       });
@@ -140,7 +144,7 @@ export const useWorkspaceStore = create((set, get) => ({
       set({
         members: payload.members.map((member) => ({
           ...member,
-          online: get().onlineUserIds.includes(member.id) || member.online
+          online: get().onlineUserIds.includes(member.id)
         })),
         invitations: payload.invitations,
         error: null

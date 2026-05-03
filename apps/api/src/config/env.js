@@ -14,7 +14,13 @@ const env = {
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
   accessTokenCookieName: process.env.ACCESS_TOKEN_COOKIE_NAME || "fredocloud_access_token",
   refreshTokenCookieName:
-    process.env.REFRESH_TOKEN_COOKIE_NAME || "fredocloud_refresh_token"
+    process.env.REFRESH_TOKEN_COOKIE_NAME || "fredocloud_refresh_token",
+  emailJsServiceId: process.env.EMAILJS_SERVICE_ID || "",
+  emailJsPublicKey: process.env.EMAILJS_PUBLIC_KEY || "",
+  emailJsPrivateKey: process.env.EMAILJS_PRIVATE_KEY || "",
+  emailJsInviteTemplateId: process.env.EMAILJS_INVITE_TEMPLATE_ID || "",
+  emailJsMentionTemplateId: process.env.EMAILJS_MENTION_TEMPLATE_ID || "",
+  appName: process.env.APP_NAME || "FredoCloud"
 };
 
 module.exports = { env };
