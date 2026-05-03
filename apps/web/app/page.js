@@ -355,7 +355,7 @@ export default function HomePage() {
                 key={idx} 
                 className="rounded-3xl border border-white/60 bg-white/60 p-8 shadow-sm backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-900/60"
               >
-                <div className="text-brand-500 text-4xl leading-none mb-4">"</div>
+                <div className="text-brand-500 text-4xl leading-none mb-4">&quot;</div>
                 <p className="text-slate-700 dark:text-slate-300 italic mb-6">
                   {testimonial.quote}
                 </p>
