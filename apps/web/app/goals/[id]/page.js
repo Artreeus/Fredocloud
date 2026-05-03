@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
@@ -67,6 +68,9 @@ export default function GoalDetailPage({ params }) {
     progress: 0
   });
   const [updateText, setUpdateText] = useState("");
+  const [isAddingMilestone, setIsAddingMilestone] = useState(false);
+  const [isPostingUpdate, setIsPostingUpdate] = useState(false);
+  
   const canUpdateGoal = hasPermission(activeWorkspace, "UPDATE_GOAL");
   const pushToast = useToastStore((state) => state.pushToast);
 
@@ -91,19 +95,29 @@ export default function GoalDetailPage({ params }) {
 
   async function handleAddMilestone(event) {
     event.preventDefault();
-    await addMilestone(goal.id, milestoneForm);
-    setMilestoneForm({
-      title: "",
-      progress: 0
-    });
-    pushToast({ type: "success", message: "Milestone added." });
+    setIsAddingMilestone(true);
+    try {
+      await addMilestone(goal.id, milestoneForm);
+      setMilestoneForm({
+        title: "",
+        progress: 0
+      });
+      pushToast({ type: "success", message: "Milestone added." });
+    } finally {
+      setIsAddingMilestone(false);
+    }
   }
 
   async function handlePostUpdate(event) {
     event.preventDefault();
-    await addUpdate(goal.id, updateText);
-    setUpdateText("");
-    pushToast({ type: "success", message: "Progress update posted." });
+    setIsPostingUpdate(true);
+    try {
+      await addUpdate(goal.id, updateText);
+      setUpdateText("");
+      pushToast({ type: "success", message: "Progress update posted." });
+    } finally {
+      setIsPostingUpdate(false);
+    }
   }
 
   async function handleMilestoneProgressChange(milestoneId, progress) {
@@ -240,10 +254,17 @@ export default function GoalDetailPage({ params }) {
                   />
                   <button
                     type="submit"
-                    disabled={loading || !canUpdateGoal}
-                    className="rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isAddingMilestone || loading || !canUpdateGoal}
+                    className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-3 text-sm font-bold text-white transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    Add milestone
+                    {isAddingMilestone ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      "Add milestone"
+                    )}
                   </button>
                 </div>
               </form>
@@ -267,10 +288,17 @@ export default function GoalDetailPage({ params }) {
                 />
                 <button
                   type="submit"
-                  disabled={loading || !canUpdateGoal}
-                  className="rounded-2xl bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={isPostingUpdate || loading || !canUpdateGoal}
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Post update
+                  {isPostingUpdate ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Posting...
+                    </>
+                  ) : (
+                    "Post update"
+                  )}
                 </button>
               </form>
 

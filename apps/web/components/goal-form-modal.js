@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { CustomSelect } from "@/components/ui/select";
 
 const emptyMilestone = {
@@ -224,9 +225,16 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800 dark:hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-800"
+            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800 dark:hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-800"
           >
-            {loading ? "Saving..." : "Save goal"}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save goal"
+            )}
           </button>
         </form>
       </div>
