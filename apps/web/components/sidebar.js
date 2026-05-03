@@ -145,7 +145,7 @@ export function Sidebar() {
   }, [closeNotifications]);
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200/60 bg-canvas/80 dark:border-slate-800/50 dark:bg-slate-950/80 backdrop-blur-3xl transition-colors duration-300">
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200/80 bg-white dark:border-slate-800/80 dark:bg-slate-950 transition-colors duration-300">
       {/* Brand Header */}
       <div className="flex h-24 shrink-0 items-center justify-between px-6">
         <Link href="/dashboard" className="flex items-center gap-3">

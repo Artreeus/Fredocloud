@@ -96,7 +96,7 @@ export default function DashboardPage() {
   return (
     <ProtectedLayout>
       <section className="grid gap-6 lg:grid-cols-[1.45fr_1fr]">
-        <article className="rounded-[2.3rem] border border-white/60 dark:border-slate-800/60 bg-white/76 dark:bg-slate-900/76 p-8 shadow-float backdrop-blur-xl">
+        <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
@@ -121,26 +121,26 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={handleExport}
-              className="rounded-full border border-slate-200/80 dark:border-slate-700/80 bg-white/90 dark:bg-slate-800/90 px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-white dark:hover:bg-slate-700"
+              className="rounded-full border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-800/90 px-5 py-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-white dark:hover:bg-slate-700"
             >
               Export CSV
             </button>
           </div>
 
           <div className="mt-10 grid gap-4 md:grid-cols-3">
-            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Description</p>
               <p className="mt-3 text-sm text-slate-700 dark:text-slate-300">
                 {activeWorkspace?.description || "No description added yet."}
               </p>
             </div>
-            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Role</p>
               <p className="mt-3 text-sm font-medium text-slate-900 dark:text-white">
                 {activeWorkspace?.role || "Member"}
               </p>
             </div>
-            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.9rem] border border-slate-200/80 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total workspaces</p>
               <p className="mt-3 text-sm font-medium text-slate-900 dark:text-white">{workspaces.length}</p>
             </div>
@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
           {showCreateForm ? (
             <form
-              className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200/80 dark:border-slate-800 bg-white/84 dark:bg-slate-900/84 p-6"
+              className="mt-8 grid gap-4 rounded-[2rem] border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6"
               onSubmit={handleCreateWorkspace}
             >
               <label className="block">
@@ -173,7 +173,7 @@ export default function DashboardPage() {
                   type="text"
                   value={form.name}
                   onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-                  className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
+                  className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
                   placeholder="Design Ops"
                 />
               </label>
@@ -184,7 +184,7 @@ export default function DashboardPage() {
                   onChange={(event) =>
                     setForm((current) => ({ ...current, description: event.target.value }))
                   }
-                  className="min-h-28 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
+                  className="min-h-28 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
                   placeholder="What is this workspace for?"
                 />
               </label>
@@ -215,13 +215,13 @@ export default function DashboardPage() {
           ) : null}
         </article>
 
-        <article className="rounded-[2.3rem] border border-slate-900/10 dark:border-white/10 bg-slate-950 p-8 text-white shadow-float">
+        <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-slate-950 p-8 text-white shadow-lg">
           <p className="text-xs uppercase tracking-[0.28em] text-slate-400">Inbox</p>
           <h2 className="mt-3 font-display text-3xl text-white">Pending invitations</h2>
           <div className="mt-6 space-y-4">
             {pendingInvitations.length ? (
               pendingInvitations.map((invitation) => (
-                <div key={invitation.id} className="rounded-[1.8rem] border border-white/10 bg-white/10 p-5">
+                <div key={invitation.id} className="rounded-[1.8rem] border border-white/10 bg-white/5 p-5">
                   <p className="text-sm font-medium">{invitation.workspaceName}</p>
                   <p className="mt-2 text-sm text-slate-200">
                     Join as {invitation.role.toLowerCase()}.
@@ -243,7 +243,7 @@ export default function DashboardPage() {
       </section>
 
       <section className="mt-6 grid gap-6">
-        <article className="rounded-[2.3rem] border border-white/60 dark:border-slate-800/60 bg-white/76 dark:bg-slate-900/76 p-8 shadow-float backdrop-blur-xl">
+        <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
@@ -257,25 +257,25 @@ export default function DashboardPage() {
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[1.8rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total goals</p>
               <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
                 {analytics?.stats?.totalGoals ?? "--"}
               </p>
             </div>
-            <div className="rounded-[1.8rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Completed this week</p>
               <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
                 {analytics?.stats?.completedThisWeek ?? "--"}
               </p>
             </div>
-            <div className="rounded-[1.8rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Overdue tasks</p>
               <p className="mt-3 text-3xl font-semibold text-rose-600 dark:text-rose-400">
                 {analytics?.stats?.overdueCount ?? "--"}
               </p>
             </div>
-            <div className="rounded-[1.8rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Active members</p>
               <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
                 {analytics?.stats?.activeMembers ?? "--"}
@@ -287,7 +287,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-[2rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-sm font-semibold text-slate-950 dark:text-white">Goal completion trend</p>
               <p className="mt-1 text-sm text-slate-500">Completed vs total goals over recent weekly buckets.</p>
               <div className="mt-6 h-80">
@@ -303,7 +303,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-slate-200/80 dark:border-slate-800/80 bg-white/84 dark:bg-slate-900/84 p-5">
+            <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
               <p className="text-sm font-semibold text-slate-950 dark:text-white">Priority distribution</p>
               <p className="mt-1 text-sm text-slate-500">How current action items are spread across priorities.</p>
               <div className="mt-6 h-80">

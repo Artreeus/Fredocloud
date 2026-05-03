@@ -42,12 +42,17 @@ export function ProtectedLayout({ children }) {
   if (!hydrated || loading || !user || !workspaceInitialized || workspaceLoading) {
     return (
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 bg-canvas dark:bg-slate-950 transition-colors duration-300">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(88,113,93,0.14),transparent_24%)] dark:opacity-40" />
-        <div className="relative flex flex-col items-center gap-6 rounded-[2.5rem] border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 p-12 shadow-float backdrop-blur-2xl animate-fade-in">
-          <Loader size="lg" />
-          <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 animate-pulse">
-            Loading your workspace...
-          </p>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.1),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(88,113,93,0.1),transparent_30%)]" />
+        <div className="relative flex flex-col items-center gap-6 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-16 shadow-2xl animate-in fade-in zoom-in duration-500">
+          <Loader size="xl" />
+          <div className="text-center space-y-2">
+            <p className="font-display text-xs font-black uppercase tracking-[0.4em] text-brand-600 dark:text-brand-500">
+              FredoCloud Hub
+            </p>
+            <p className="font-sans text-sm font-bold text-slate-400 dark:text-slate-500">
+              Synchronizing workspace...
+            </p>
+          </div>
         </div>
       </main>
     );

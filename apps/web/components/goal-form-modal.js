@@ -70,19 +70,19 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-2xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 px-6 py-10 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-[2.2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-2xl animate-in zoom-in duration-300">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
               Goals
             </p>
-            <h2 className="mt-3 font-display text-3xl text-slate-950">{title}</h2>
+            <h2 className="mt-3 font-display text-3xl text-slate-950 dark:text-white">{title}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600"
+            className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-slate-700"
           >
             Close
           </button>
@@ -90,33 +90,33 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Goal title</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Goal title</span>
             <input
               type="text"
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Description</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Description</span>
             <textarea
               value={form.description}
               onChange={(event) =>
                 setForm((current) => ({ ...current, description: event.target.value }))
               }
-              className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="min-h-28 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
             />
           </label>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Owner</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Owner</span>
               <select
                 value={form.assigneeId}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, assigneeId: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               >
                 <option value="">Unassigned</option>
                 {members.map((member) => (
@@ -127,22 +127,22 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
               </select>
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Due date</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Due date</span>
               <input
                 type="date"
                 value={form.dueDate}
                 onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               />
             </label>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Status</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Status</span>
               <select
                 value={form.status}
                 onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               >
                 <option value="NOT_STARTED">Not Started</option>
                 <option value="IN_PROGRESS">In Progress</option>
@@ -151,13 +151,13 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
               </select>
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Priority</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</span>
               <select
                 value={form.priority}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, priority: event.target.value }))
                 }
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               >
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
@@ -167,9 +167,9 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
             </label>
           </div>
           {!initialValues ? (
-            <div className="rounded-[2rem] border border-slate-200/80 bg-slate-50/80 p-5">
+            <div className="rounded-[2rem] border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 p-5">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
                   Milestones
                 </h3>
                 <button
@@ -180,7 +180,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                       milestones: [...current.milestones, { ...emptyMilestone }]
                     }))
                   }
-                  className="rounded-full bg-white px-4 py-2 text-sm text-slate-700"
+                  className="rounded-full bg-white dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-700 dark:text-slate-300 shadow-sm transition hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   Add milestone
                 </button>
@@ -199,7 +199,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                           )
                         }))
                       }
-                      className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                      className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
                       placeholder="Milestone title"
                     />
                     <input
@@ -217,7 +217,7 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
                           )
                         }))
                       }
-                      className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                      className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
                       placeholder="0-100"
                     />
                   </div>
@@ -226,12 +226,12 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
             </div>
           ) : null}
           {error ? (
-            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+            <p className="rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-4 py-3 text-sm font-medium text-rose-700 dark:text-rose-400">{error}</p>
           ) : null}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-medium text-white disabled:bg-slate-400"
+            className="w-full rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800 dark:hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-800"
           >
             {loading ? "Saving..." : "Save goal"}
           </button>
