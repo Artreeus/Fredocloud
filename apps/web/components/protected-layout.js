@@ -1,15 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { Loader } from "@/components/ui/loader";
 import { Sidebar } from "@/components/sidebar";
+import { Menu } from "lucide-react";
 import { WorkspaceRealtimeBridge } from "@/components/workspace-realtime-bridge";
 import { useAuthStore } from "@/stores/auth-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export function ProtectedLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const hydrated = useAuthStore((state) => state.hydrated);
   const user = useAuthStore((state) => state.user);
   const loading = useAuthStore((state) => state.loading);
@@ -37,6 +40,10 @@ export function ProtectedLayout({ children }) {
       bootstrap().catch(() => {});
     }
   }, [bootstrap, user]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   if (!hydrated || loading || !user || !workspaceInitialized) {
     return (
@@ -67,12 +74,27 @@ export function ProtectedLayout({ children }) {
       <WorkspaceRealtimeBridge workspaceId={activeWorkspace?.id} />
       
       {/* Sidebar fixed to the left */}
-      <Sidebar />
+      <Sidebar isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       
-      {/* Main content area, offset by the sidebar width (72 = 18rem) */}
-      <div className="flex flex-1 flex-col pl-72">
-        <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.03),transparent_62%)]" />
-        <main className="relative mx-auto w-full max-w-[1440px] px-10 py-12">{children}</main>
+      {/* Main content area, offset by the sidebar width on desktop */}
+      <div className="flex flex-1 flex-col lg:pl-72 w-full max-w-[100vw]">
+        
+        {/* Mobile Header */}
+        <div className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/80 px-6 backdrop-blur-md dark:border-slate-800/80 dark:bg-slate-950/80 lg:hidden">
+          <div className="flex items-center gap-2">
+            <span className="font-display text-lg font-black tracking-tight text-slate-950 dark:text-white">FredoCloud</span>
+          </div>
+          <button 
+            type="button" 
+            onClick={() => setIsMobileMenuOpen(true)} 
+            className="rounded-xl bg-slate-100 p-2 text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="pointer-events-none fixed inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_top,rgba(16,33,43,0.08),transparent_62%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.03),transparent_62%)] lg:left-72" />
+        <main className="relative mx-auto w-full max-w-[1440px] px-6 py-8 lg:px-10 lg:py-12">{children}</main>
       </div>
     </div>
   );

@@ -75,7 +75,7 @@ function formatRelativeTime(value) {
   return "";
 }
 
-export function Sidebar() {
+export function Sidebar({ isOpen, onClose }) {
   const pathname = usePathname();
   const router = useRouter();
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -146,9 +146,22 @@ export function Sidebar() {
   }, [closeNotifications]);
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r border-slate-200/80 bg-white dark:border-slate-800/80 dark:bg-slate-950 transition-colors duration-300">
-      {/* Brand Header */}
-      <div className="flex h-24 shrink-0 items-center justify-between px-6">
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm lg:hidden transition-opacity"
+          onClick={onClose}
+        />
+      )}
+
+      <aside 
+        className={`fixed left-0 top-0 z-50 flex h-screen w-72 flex-col border-r border-slate-200/80 bg-white dark:border-slate-800/80 dark:bg-slate-950 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Brand Header */}
+        <div className="flex h-16 lg:h-24 shrink-0 items-center justify-between px-6 border-b lg:border-none border-slate-200/80 dark:border-slate-800/80">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="relative">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-slate-200/80 dark:bg-slate-900 dark:ring-white/10">
@@ -389,5 +402,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
