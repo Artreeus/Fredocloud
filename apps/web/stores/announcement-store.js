@@ -92,6 +92,36 @@ function insertComment(comments, nextComment, parentCommentId) {
   });
 }
 
+function updateCommentInTree(comments, nextComment) {
+  return comments.map((comment) => {
+    if (comment.id === nextComment.id) {
+      return {
+        ...comment,
+        ...nextComment,
+        replies: comment.replies || []
+      };
+    }
+
+    if (comment.replies?.length) {
+      return {
+        ...comment,
+        replies: updateCommentInTree(comment.replies, nextComment)
+      };
+    }
+
+    return comment;
+  });
+}
+
+function removeCommentFromTree(comments, commentId) {
+  return comments
+    .filter((comment) => comment.id !== commentId)
+    .map((comment) => ({
+      ...comment,
+      replies: comment.replies?.length ? removeCommentFromTree(comment.replies, commentId) : []
+    }));
+}
+
 export const useAnnouncementStore = create((set, get) => ({
   announcements: [],
   currentAnnouncement: null,
@@ -143,6 +173,35 @@ export const useAnnouncementStore = create((set, get) => ({
           ? {
               ...announcement,
               commentCount: (announcement.commentCount || 0) + 1
+            }
+          : announcement
+      )
+    })),
+  applySocketCommentUpdate: ({ announcementId, comment }) =>
+    set((state) => ({
+      comments:
+        state.currentAnnouncement?.id === announcementId
+          ? updateCommentInTree(state.comments, comment)
+          : state.comments
+    })),
+  applySocketCommentDelete: ({ announcementId, commentId }) =>
+    set((state) => ({
+      comments:
+        state.currentAnnouncement?.id === announcementId
+          ? removeCommentFromTree(state.comments, commentId)
+          : state.comments,
+      currentAnnouncement:
+        state.currentAnnouncement?.id === announcementId
+          ? {
+              ...state.currentAnnouncement,
+              commentCount: Math.max(0, (state.currentAnnouncement.commentCount || 0) - 1)
+            }
+          : state.currentAnnouncement,
+      announcements: state.announcements.map((announcement) =>
+        announcement.id === announcementId
+          ? {
+              ...announcement,
+              commentCount: Math.max(0, (announcement.commentCount || 0) - 1)
             }
           : announcement
       )
@@ -394,11 +453,90 @@ export const useAnnouncementStore = create((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      await apiRequest(`/api/announcements/${announcementId}/comments`, {
+      const payload = await apiRequest(`/api/announcements/${announcementId}/comments`, {
         method: "POST",
         body: JSON.stringify(values)
       });
-      return get().fetchComments(announcementId);
+
+      set((state) => ({
+        comments: insertComment(state.comments, payload.comment, values.parentCommentId),
+        currentAnnouncement:
+          state.currentAnnouncement?.id === announcementId
+            ? {
+                ...state.currentAnnouncement,
+                commentCount: (state.currentAnnouncement.commentCount || 0) + 1
+              }
+            : state.currentAnnouncement,
+        announcements: state.announcements.map((announcement) =>
+          announcement.id === announcementId
+            ? {
+                ...announcement,
+                commentCount: (announcement.commentCount || 0) + 1
+              }
+            : announcement
+        ),
+        error: null
+      }));
+
+      return payload.comment;
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  updateComment: async (announcementId, commentId, values) => {
+    set({ loading: true, error: null });
+
+    try {
+      const payload = await apiRequest(`/api/announcements/${announcementId}/comments/${commentId}`, {
+        method: "PATCH",
+        body: JSON.stringify(values)
+      });
+
+      set((state) => ({
+        comments: updateCommentInTree(state.comments, payload.comment),
+        error: null
+      }));
+
+      return payload.comment;
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
+  deleteComment: async (announcementId, commentId) => {
+    set({ loading: true, error: null });
+
+    try {
+      await apiRequest(`/api/announcements/${announcementId}/comments/${commentId}`, {
+        method: "DELETE"
+      });
+
+      set((state) => ({
+        comments: removeCommentFromTree(state.comments, commentId),
+        currentAnnouncement:
+          state.currentAnnouncement?.id === announcementId
+            ? {
+                ...state.currentAnnouncement,
+                commentCount: Math.max(0, (state.currentAnnouncement.commentCount || 0) - 1)
+              }
+            : state.currentAnnouncement,
+        announcements: state.announcements.map((announcement) =>
+          announcement.id === announcementId
+            ? {
+                ...announcement,
+                commentCount: Math.max(0, (announcement.commentCount || 0) - 1)
+              }
+            : announcement
+        ),
+        error: null
+      }));
+
+      return true;
     } catch (error) {
       set({ error: error.message });
       throw error;

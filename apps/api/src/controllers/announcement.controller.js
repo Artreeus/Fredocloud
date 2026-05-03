@@ -473,6 +473,74 @@ async function createComment(req, res, next) {
   }
 }
 
+async function updateComment(req, res, next) {
+  try {
+    const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
+    const { body } = req.body;
+
+    if (!body) {
+      throw createError("Comment body is required", 400);
+    }
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: req.params.commentId },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true, avatarUrl: true }
+        }
+      }
+    });
+
+    if (!comment || comment.announcementId !== announcement.id) {
+      throw createError("Comment not found for this announcement", 404);
+    }
+
+    const canModerate = await assertWorkspacePermission(
+      announcement.workspaceId,
+      req.user.id,
+      Permission.DELETE_CONTENT
+    ).then(
+      () => true,
+      () => false
+    );
+
+    if (comment.authorId !== req.user.id && !canModerate) {
+      throw createError("You do not have permission to update this comment", 403);
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: comment.id },
+      data: { body },
+      include: {
+        author: {
+          select: { id: true, name: true, email: true, avatarUrl: true }
+        }
+      }
+    });
+
+    const serializedComment = {
+      id: updatedComment.id,
+      body: updatedComment.body,
+      createdAt: updatedComment.createdAt,
+      updatedAt: updatedComment.updatedAt,
+      author: updatedComment.author,
+      replies: []
+    };
+
+    emitWorkspaceEvent(announcement.workspaceId, "comment:update", {
+      announcementId: announcement.id,
+      comment: serializedComment
+    });
+
+    return res.status(200).json({
+      message: "Comment updated successfully",
+      comment: serializedComment
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function listComments(req, res, next) {
   try {
     const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
@@ -491,6 +559,47 @@ async function listComments(req, res, next) {
 
     return res.status(200).json({
       comments: buildCommentTree(comments)
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function deleteComment(req, res, next) {
+  try {
+    const { announcement } = await getAnnouncementOrThrow(req.params.id, req.user.id);
+    const comment = await prisma.comment.findUnique({
+      where: { id: req.params.commentId }
+    });
+
+    if (!comment || comment.announcementId !== announcement.id) {
+      throw createError("Comment not found for this announcement", 404);
+    }
+
+    const canModerate = await assertWorkspacePermission(
+      announcement.workspaceId,
+      req.user.id,
+      Permission.DELETE_CONTENT
+    ).then(
+      () => true,
+      () => false
+    );
+
+    if (comment.authorId !== req.user.id && !canModerate) {
+      throw createError("You do not have permission to delete this comment", 403);
+    }
+
+    await prisma.comment.delete({
+      where: { id: comment.id }
+    });
+
+    emitWorkspaceEvent(announcement.workspaceId, "comment:delete", {
+      announcementId: announcement.id,
+      commentId: comment.id
+    });
+
+    return res.status(200).json({
+      message: "Comment deleted successfully"
     });
   } catch (error) {
     return next(error);
@@ -517,11 +626,13 @@ async function deleteAnnouncement(req, res, next) {
 module.exports = {
   createAnnouncement,
   createComment,
+  deleteComment,
   deleteAnnouncement,
   getAnnouncement,
   listAnnouncements,
   listComments,
   pinAnnouncement,
   toggleReaction,
+  updateComment,
   updateAnnouncement
 };

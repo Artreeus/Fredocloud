@@ -11,11 +11,13 @@ import { MentionTextarea } from "@/components/mention-textarea";
 import { ProtectedLayout } from "@/components/protected-layout";
 import { ReactionBar } from "@/components/reaction-bar";
 import { useAnnouncementStore } from "@/stores/announcement-store";
+import { useAuthStore } from "@/stores/auth-store";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function AnnouncementDetailPage({ params }) {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
   const announcement = useAnnouncementStore((state) => state.currentAnnouncement);
@@ -27,6 +29,8 @@ export default function AnnouncementDetailPage({ params }) {
   const updateAnnouncement = useAnnouncementStore((state) => state.updateAnnouncement);
   const deleteAnnouncement = useAnnouncementStore((state) => state.deleteAnnouncement);
   const addComment = useAnnouncementStore((state) => state.addComment);
+  const updateComment = useAnnouncementStore((state) => state.updateComment);
+  const deleteComment = useAnnouncementStore((state) => state.deleteComment);
   const toggleReaction = useAnnouncementStore((state) => state.toggleReaction);
   const [commentBody, setCommentBody] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
@@ -50,19 +54,27 @@ export default function AnnouncementDetailPage({ params }) {
   async function handleAddComment(event) {
     event.preventDefault();
     await addComment(params.id, { body: commentBody });
-    await fetchAnnouncement(params.id);
     setCommentBody("");
     pushToast({ type: "success", message: "Comment posted." });
   }
 
   async function handleReply(parentCommentId, body) {
     await addComment(params.id, { body, parentCommentId });
-    await fetchAnnouncement(params.id);
+    pushToast({ type: "success", message: "Reply posted." });
+  }
+
+  async function handleEditComment(commentId, body) {
+    await updateComment(params.id, commentId, { body });
+    pushToast({ type: "success", message: "Comment updated." });
+  }
+
+  async function handleDeleteComment(commentId) {
+    await deleteComment(params.id, commentId);
+    pushToast({ type: "success", message: "Comment deleted." });
   }
 
   async function handleToggleReaction(type) {
     await toggleReaction(params.id, type);
-    await fetchAnnouncement(params.id);
   }
 
   async function handleEditAnnouncement(values) {
@@ -166,7 +178,16 @@ export default function AnnouncementDetailPage({ params }) {
             </form>
 
             <div className="mt-8">
-              <CommentThread comments={comments} onReply={handleReply} loading={loading} members={members} />
+              <CommentThread
+                comments={comments}
+                onReply={handleReply}
+                onEdit={handleEditComment}
+                onDelete={handleDeleteComment}
+                loading={loading}
+                members={members}
+                currentUserId={user?.id}
+                canModerate={canDeleteContent}
+              />
             </div>
 
             {!comments.length ? (
