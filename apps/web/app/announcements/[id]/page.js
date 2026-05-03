@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { Loader } from "@/components/ui/loader";
 import { CommentThread } from "@/components/comment-thread";
 import { MentionTextarea } from "@/components/mention-textarea";
 import { ProtectedLayout } from "@/components/protected-layout";
@@ -58,28 +60,28 @@ export default function AnnouncementDetailPage({ params }) {
     <ProtectedLayout>
       {announcement ? (
         <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <article className="rounded-[2.3rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
+          <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
             <div className="flex flex-wrap items-center gap-2">
               {announcement.pinned ? (
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                <span className="rounded-full bg-amber-50 dark:bg-amber-900/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   Pinned
                 </span>
               ) : null}
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+              <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                 {new Date(announcement.publishedAt || announcement.createdAt).toLocaleString()}
               </span>
             </div>
-            <h1 className="mt-4 font-display text-5xl text-slate-950">
+            <h1 className="mt-4 font-display text-5xl text-slate-950 dark:text-white">
               {announcement.title}
             </h1>
-            <p className="mt-3 text-sm text-slate-500">By {announcement.author?.name}</p>
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">By {announcement.author?.name}</p>
 
             <div
-              className="prose prose-slate mt-8 max-w-none text-sm"
+              className="prose prose-slate dark:prose-invert mt-8 max-w-none text-sm leading-relaxed"
               dangerouslySetInnerHTML={{ __html: announcement.body }}
             />
 
-            <div className="mt-8">
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800">
               <ReactionBar
                 reactionSummary={announcement.reactionSummary}
                 onToggle={handleToggleReaction}
@@ -88,11 +90,11 @@ export default function AnnouncementDetailPage({ params }) {
             </div>
           </article>
 
-          <article className="rounded-[2.15rem] border border-white/60 bg-white/76 p-8 shadow-float backdrop-blur-xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+          <article className="rounded-[2.15rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
               Comments
             </p>
-            <h2 className="mt-3 font-display text-3xl text-slate-950">
+            <h2 className="mt-3 font-display text-3xl text-slate-950 dark:text-white">
               Discussion
             </h2>
 
@@ -101,16 +103,22 @@ export default function AnnouncementDetailPage({ params }) {
                 value={commentBody}
                 onChange={setCommentBody}
                 members={members}
-                className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="min-h-28 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
                 placeholder="Add a comment..."
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-2xl px-5 py-3 text-sm font-medium text-white disabled:bg-slate-400"
-                style={{ backgroundColor: activeWorkspace?.accentColor || "#2745f2" }}
+                className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
               >
-                Post comment
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Posting...
+                  </>
+                ) : (
+                  "Post comment"
+                )}
               </button>
             </form>
 
@@ -119,13 +127,13 @@ export default function AnnouncementDetailPage({ params }) {
             </div>
 
             {!comments.length ? (
-              <p className="mt-6 text-sm text-slate-500">No comments yet for this announcement.</p>
+              <p className="mt-6 text-sm font-medium text-slate-500 dark:text-slate-400">No comments yet for this announcement.</p>
             ) : null}
           </article>
         </section>
       ) : (
-        <div className="rounded-[2.1rem] border border-white/60 bg-white/76 p-8 text-sm text-slate-500 shadow-float backdrop-blur-xl">
-          {loading ? "Loading announcement..." : "Announcement not found."}
+        <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+          {loading ? <Loader size="lg" /> : <p className="text-sm font-medium text-slate-500">Announcement not found.</p>}
         </div>
       )}
 

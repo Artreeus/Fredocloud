@@ -15,17 +15,17 @@ function CommentItem({ comment, onReply, loading, members, depth = 0 }) {
   }
 
   return (
-    <div className={`${depth ? "ml-6 border-l border-slate-200 pl-4" : ""}`}>
-      <div className="rounded-3xl bg-slate-50 p-4">
+    <div className={`${depth ? "ml-6 border-l border-slate-200 dark:border-slate-800 pl-4" : ""}`}>
+      <div className="rounded-3xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-4 transition hover:border-slate-200 dark:hover:border-slate-700">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-medium text-slate-900">{comment.author?.name}</p>
-          <p className="text-xs text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
+          <p className="text-sm font-bold text-slate-900 dark:text-white">{comment.author?.name}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{new Date(comment.createdAt).toLocaleString()}</p>
         </div>
-        <p className="mt-3 text-sm leading-6 text-slate-600">{renderMentionText(comment.body)}</p>
+        <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">{renderMentionText(comment.body)}</p>
         <button
           type="button"
           onClick={() => setReplyOpen((current) => !current)}
-          className="mt-3 text-xs font-medium text-slate-600"
+          className="mt-3 text-xs font-bold text-slate-500 dark:text-slate-400 transition hover:text-brand-600"
         >
           {replyOpen ? "Cancel reply" : "Reply"}
         </button>
@@ -35,13 +35,13 @@ function CommentItem({ comment, onReply, loading, members, depth = 0 }) {
               value={replyBody}
               onChange={setReplyBody}
               members={members}
-              className="min-h-24 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none"
+              className="min-h-24 w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400"
               placeholder="Write a reply..."
             />
             <button
               type="submit"
               disabled={loading}
-              className="rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white disabled:bg-slate-400"
+              className="rounded-full bg-slate-950 dark:bg-brand-600 px-5 py-2 text-xs font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
             >
               Post reply
             </button>

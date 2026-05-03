@@ -73,16 +73,16 @@ export function MentionTextarea({
         placeholder={placeholder}
       />
       {suggestions.length ? (
-        <div className="absolute left-0 top-full z-20 mt-2 w-full rounded-[1.4rem] border border-slate-200 bg-white p-2 shadow-float">
+        <div className="absolute left-0 top-full z-20 mt-2 w-full rounded-[1.4rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl animate-in fade-in slide-in-from-top-2">
           {suggestions.map((member) => (
             <button
               key={member.id}
               type="button"
               onClick={() => handleSelect(member)}
-              className="flex w-full items-center justify-between rounded-2xl px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50"
+              className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-left text-sm font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
             >
               <span>{member.name}</span>
-              <span className="text-xs text-slate-400">@mention</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">@mention</span>
             </button>
           ))}
         </div>
