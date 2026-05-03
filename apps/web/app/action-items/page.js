@@ -345,11 +345,11 @@ export default function ActionItemsPage() {
           </label>
         </section>
 
-        {loading && actionItems.length === 0 ? (
-          <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <Loader size="lg" />
-          </div>
-        ) : viewMode === "kanban" ? (
+        {loading && actionItems.length === 0 && (
+          <Loader modal size="xl" />
+        )}
+
+        {viewMode === "kanban" ? (
           <DragDropContext onDragEnd={canUpdateActionItem ? handleDragEnd : () => {}}>
             <section className="grid gap-5 xl:grid-cols-3">
               {kanbanItems.map((column) => (
@@ -509,7 +509,7 @@ export default function ActionItemsPage() {
               </div>
             ) : null}
           </section>
-        )}
+        }
       </section>
 
       <ActionItemFormModal

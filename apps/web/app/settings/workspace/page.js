@@ -6,7 +6,7 @@ import { ProtectedLayout } from "@/components/protected-layout";
 import { useAuthStore } from "@/stores/auth-store";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
-import { CustomSelect } from "@/components/custom-select";
+import { CustomSelect } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 
 const roleOptions = ["ADMIN", "MEMBER"];
@@ -119,6 +119,9 @@ export default function WorkspaceSettingsPage() {
 
   return (
     <ProtectedLayout>
+      {loading && members.length === 0 && (
+        <Loader modal size="xl" />
+      )}
       <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
         <article className="rounded-[2.3rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-sm">
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">

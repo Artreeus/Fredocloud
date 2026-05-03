@@ -89,12 +89,11 @@ export default function AnnouncementsPage() {
           )}
         </div>
 
-        {loading && announcements.length === 0 ? (
-          <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <Loader size="lg" />
-          </div>
-        ) : (
-          <div className="space-y-5">
+        {loading && announcements.length === 0 && (
+          <Loader modal size="xl" />
+        )}
+
+        <div className="space-y-5">
             {announcements.map((announcement) => (
               <article
                 key={announcement.id}
@@ -155,7 +154,6 @@ export default function AnnouncementsPage() {
               </div>
             ) : null}
           </div>
-        )}
       </section>
 
       <AnnouncementFormModal

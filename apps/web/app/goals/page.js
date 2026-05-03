@@ -139,12 +139,11 @@ export default function GoalsPage() {
           </label>
         </section>
 
-        {loading && goals.length === 0 ? (
-          <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <Loader size="lg" />
-          </div>
-        ) : (
-          <section className="grid gap-5">
+        {loading && goals.length === 0 && (
+          <Loader modal size="xl" />
+        )}
+
+        <section className="grid gap-5">
             {goals.map((goal) => {
               const overdue =
                 goal.dueDate &&
@@ -218,7 +217,6 @@ export default function GoalsPage() {
               </div>
             ) : null}
           </section>
-        )}
       </section>
 
       <GoalFormModal
