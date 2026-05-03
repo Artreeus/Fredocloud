@@ -12,7 +12,6 @@ import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
 export default function AnnouncementDetailPage({ params }) {
-  const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
   const announcement = useAnnouncementStore((state) => state.currentAnnouncement);
   const comments = useAnnouncementStore((state) => state.comments);
