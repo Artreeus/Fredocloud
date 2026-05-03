@@ -9,7 +9,17 @@ const emptyMilestone = {
   progress: 0
 };
 
-export function GoalFormModal({ open, onClose, onSubmit, members, initialValues, loading, title }) {
+export function GoalFormModal({
+  open,
+  onClose,
+  onSubmit,
+  onDelete,
+  canDelete = false,
+  members,
+  initialValues,
+  loading,
+  title
+}) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -222,20 +232,34 @@ export function GoalFormModal({ open, onClose, onSubmit, members, initialValues,
           {error ? (
             <p className="rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-4 py-3 text-sm font-medium text-rose-700 dark:text-rose-400">{error}</p>
           ) : null}
-          <button
-            type="submit"
-            disabled={loading}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800 dark:hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-800"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Saving...
-              </>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            {onDelete && canDelete ? (
+              <button
+                type="button"
+                onClick={onDelete}
+                disabled={loading}
+                className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm font-bold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-300 dark:hover:bg-rose-950/30"
+              >
+                Delete goal
+              </button>
             ) : (
-              "Save goal"
+              <span />
             )}
-          </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-5 py-4 text-sm font-bold text-white transition hover:bg-slate-800 dark:hover:bg-brand-500 disabled:cursor-not-allowed disabled:bg-slate-400 dark:disabled:bg-slate-800 sm:w-auto sm:min-w-40"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save goal"
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>

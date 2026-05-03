@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { hasPermission } from "@/lib/permissions";
 import { GoalFormModal } from "@/components/goal-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
@@ -51,6 +52,7 @@ function MilestoneSlider({ milestone, canUpdateGoal, onChangeEnd }) {
 }
 
 export default function GoalDetailPage({ params }) {
+  const router = useRouter();
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const members = useWorkspaceStore((state) => state.members);
   const goal = useGoalStore((state) => state.currentGoal);
@@ -59,6 +61,7 @@ export default function GoalDetailPage({ params }) {
   const clearError = useGoalStore((state) => state.clearError);
   const fetchGoal = useGoalStore((state) => state.fetchGoal);
   const updateGoal = useGoalStore((state) => state.updateGoal);
+  const deleteGoal = useGoalStore((state) => state.deleteGoal);
   const addMilestone = useGoalStore((state) => state.addMilestone);
   const updateMilestone = useGoalStore((state) => state.updateMilestone);
   const addUpdate = useGoalStore((state) => state.addUpdate);
@@ -72,6 +75,7 @@ export default function GoalDetailPage({ params }) {
   const [isPostingUpdate, setIsPostingUpdate] = useState(false);
   
   const canUpdateGoal = hasPermission(activeWorkspace, "UPDATE_GOAL");
+  const canDeleteContent = hasPermission(activeWorkspace, "DELETE_CONTENT");
   const pushToast = useToastStore((state) => state.pushToast);
 
   useEffect(() => {
@@ -91,6 +95,23 @@ export default function GoalDetailPage({ params }) {
     await updateGoal(goal.id, values);
     setShowEditModal(false);
     pushToast({ type: "success", message: "Goal updated." });
+  }
+
+  async function handleDeleteGoal() {
+    if (!goal) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete "${goal.title}"? This cannot be undone.`);
+
+    if (!confirmed) {
+      return;
+    }
+
+    await deleteGoal(goal.id);
+    setShowEditModal(false);
+    pushToast({ type: "success", message: "Goal deleted." });
+    router.push("/goals");
   }
 
   async function handleAddMilestone(event) {
@@ -335,6 +356,8 @@ export default function GoalDetailPage({ params }) {
         open={showEditModal}
         onClose={() => setShowEditModal(false)}
         onSubmit={handleEditGoal}
+        onDelete={handleDeleteGoal}
+        canDelete={canDeleteContent}
         members={members}
         initialValues={goal}
         loading={loading}

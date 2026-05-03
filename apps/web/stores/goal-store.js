@@ -145,6 +145,26 @@ export const useGoalStore = create((set, get) => ({
       set({ loading: false });
     }
   },
+  deleteGoal: async (goalId) => {
+    set({ loading: true, error: null });
+
+    try {
+      await apiRequest(`/api/goals/${goalId}`, {
+        method: "DELETE"
+      });
+
+      set((state) => ({
+        goals: state.goals.filter((goal) => goal.id !== goalId),
+        currentGoal: state.currentGoal?.id === goalId ? null : state.currentGoal,
+        error: null
+      }));
+    } catch (error) {
+      set({ error: error.message });
+      throw error;
+    } finally {
+      set({ loading: false });
+    }
+  },
   addMilestone: async (goalId, values) => {
     set({ loading: true, error: null });
 
