@@ -116,6 +116,46 @@ const workspaceBlueprints = [
             body: "We agreed on the first metrics set: goal throughput, overdue actions, and engagement."
           }
         ]
+      },
+      {
+        id: "seed-goal-product-infra",
+        title: "Scale infrastructure for 10k users",
+        description: "Optimize database performance and server auto-scaling to handle projected growth.",
+        status: "NOT_STARTED",
+        priority: Priority.HIGH,
+        progress: 10,
+        dueDate: "2026-07-15T00:00:00.000Z",
+        createdById: "seed-user-demo",
+        assigneeId: "seed-user-omar",
+        milestones: [
+          {
+            id: "seed-milestone-infra-audit",
+            title: "Performance audit",
+            progress: 50,
+            ownerId: "seed-user-omar"
+          }
+        ],
+        updates: []
+      },
+      {
+        id: "seed-goal-product-mobile",
+        title: "Develop mobile app MVP",
+        description: "Build a React Native wrapper to bring the collaborative experience to iOS and Android.",
+        status: "NOT_STARTED",
+        priority: Priority.MEDIUM,
+        progress: 0,
+        dueDate: "2026-08-30T00:00:00.000Z",
+        createdById: "seed-user-demo",
+        assigneeId: "seed-user-priya",
+        milestones: [
+          {
+            id: "seed-milestone-mobile-wireframes",
+            title: "Finalize mobile UX wireframes",
+            progress: 20,
+            ownerId: "seed-user-priya"
+          }
+        ],
+        updates: []
       }
     ],
     announcements: [
@@ -154,6 +194,18 @@ const workspaceBlueprints = [
         reactions: [
           { id: "seed-reaction-beta-demo-support", userId: "seed-user-priya", type: ReactionType.SUPPORT }
         ]
+      },
+      {
+        id: "seed-announcement-infra-ready",
+        title: "Infrastructure baseline complete",
+        body: "<p>The core infrastructure for auto-scaling is now in place. We are ready to begin stress-testing for high concurrency.</p>",
+        pinned: false,
+        authorId: "seed-user-omar",
+        publishedAt: "2026-05-03T14:20:00.000Z",
+        comments: [],
+        reactions: [
+          { id: "seed-reaction-infra-like", userId: "seed-user-demo", type: ReactionType.LIKE }
+        ]
       }
     ],
     actionItems: [
@@ -187,6 +239,26 @@ const workspaceBlueprints = [
         priority: Priority.MEDIUM,
         dueDate: "2026-04-30T00:00:00.000Z",
         completedAt: "2026-04-29T15:00:00.000Z"
+      },
+      {
+        id: "seed-action-product-autoscaling",
+        title: "Configure auto-scaling groups",
+        description: "Set up AWS ASGs based on CPU and memory utilization thresholds.",
+        assigneeId: "seed-user-omar",
+        goalId: "seed-goal-product-infra",
+        status: ActionItemStatus.IN_PROGRESS,
+        priority: Priority.HIGH,
+        dueDate: "2026-05-15T00:00:00.000Z"
+      },
+      {
+        id: "seed-action-product-mobile-ux",
+        title: "Draft mobile wireframes",
+        description: "Create initial lo-fi wireframes for the dashboard and goals view.",
+        assigneeId: "seed-user-priya",
+        goalId: "seed-goal-product-mobile",
+        status: ActionItemStatus.OPEN,
+        priority: Priority.MEDIUM,
+        dueDate: "2026-05-20T00:00:00.000Z"
       }
     ],
     notifications: [
