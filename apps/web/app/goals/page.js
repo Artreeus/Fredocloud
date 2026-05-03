@@ -9,7 +9,7 @@ import { useGoalStore } from "@/stores/goal-store";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
-import { DashboardSkeleton } from "@/components/ui/skeleton";
+import { Loader } from "@/components/ui/loader";
 import { CustomSelect } from "@/components/ui/select";
 
 function formatDate(value) {
@@ -139,8 +139,10 @@ export default function GoalsPage() {
           </label>
         </section>
 
-        {loading ? (
-          <DashboardSkeleton />
+        {loading && goals.length === 0 ? (
+          <div className="flex h-[400px] items-center justify-center rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <Loader size="lg" />
+          </div>
         ) : (
           <section className="grid gap-5">
             {goals.map((goal) => {
