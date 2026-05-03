@@ -15,6 +15,7 @@ const EditorWrapper = dynamic(
         data={value}
         config={{
           placeholder: placeholder,
+          licenseKey: 'GPL',
           toolbar: {
             items: [
               "heading",
