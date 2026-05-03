@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { CustomSelect } from "@/components/ui/select";
 
 const priorityOptions = ["LOW", "MEDIUM", "HIGH", "URGENT"];
 const statusOptions = ["OPEN", "IN_PROGRESS", "DONE"];
@@ -78,19 +80,19 @@ export function ActionItemFormModal({
   }
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/50 px-6 py-10">
-      <div className="w-full max-w-3xl rounded-[2.2rem] border border-white/60 bg-white/84 p-8 shadow-float backdrop-blur-xl">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 px-6 py-10 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-[2.2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-2xl animate-in zoom-in duration-300">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
               Action Items
             </p>
-            <h2 className="mt-3 font-display text-3xl text-slate-950">{title}</h2>
+            <h2 className="mt-3 font-display text-3xl text-slate-950 dark:text-white">{title}</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full bg-slate-100 px-4 py-2 text-sm text-slate-600"
+            className="rounded-full bg-slate-100 dark:bg-slate-800 px-4 py-2 text-sm font-bold text-slate-600 dark:text-slate-300 transition hover:bg-slate-200 dark:hover:bg-slate-700"
           >
             Close
           </button>
@@ -98,108 +100,86 @@ export function ActionItemFormModal({
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Title</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Title</span>
             <input
               type="text"
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
-              className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
             />
           </label>
           <label className="block">
-            <span className="mb-2 block text-sm font-medium text-slate-700">Description</span>
+            <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Description</span>
             <textarea
               value={form.description}
               onChange={(event) =>
                 setForm((current) => ({ ...current, description: event.target.value }))
               }
-              className="min-h-28 w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+              className="min-h-28 w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
             />
           </label>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Assignee</span>
-              <select
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Assignee</span>
+              <CustomSelect
                 value={form.assigneeId}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, assigneeId: event.target.value }))
-                }
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
-              >
-                <option value="">Unassigned</option>
-                {members.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, assigneeId: value }))}
+                options={[
+                  { value: "", label: "Unassigned" },
+                  ...members.map((member) => ({ value: member.id, label: member.name }))
+                ]}
+              />
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Goal</span>
-              <select
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Goal</span>
+              <CustomSelect
                 value={form.goalId}
-                onChange={(event) => setForm((current) => ({ ...current, goalId: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
-              >
-                <option value="">No linked goal</option>
-                {goals.map((goal) => (
-                  <option key={goal.id} value={goal.id}>
-                    {goal.title}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, goalId: value }))}
+                options={[
+                  { value: "", label: "No linked goal" },
+                  ...goals.map((goal) => ({ value: goal.id, label: goal.title }))
+                ]}
+              />
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Priority</span>
-              <select
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Priority</span>
+              <CustomSelect
                 value={form.priority}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, priority: event.target.value }))
-                }
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
-              >
-                {priorityOptions.map((priority) => (
-                  <option key={priority} value={priority}>
-                    {priority}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, priority: value }))}
+                options={priorityOptions.map((priority) => ({ value: priority, label: priority }))}
+              />
             </label>
             <label className="block">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Status</span>
-              <select
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Status</span>
+              <CustomSelect
                 value={form.status}
-                onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
-              >
-                {statusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status.replaceAll("_", " ")}
-                  </option>
-                ))}
-              </select>
+                onChange={(value) => setForm((current) => ({ ...current, status: value }))}
+                options={statusOptions.map((status) => ({ value: status, label: status.replaceAll("_", " ") }))}
+              />
             </label>
             <label className="block md:col-span-2">
-              <span className="mb-2 block text-sm font-medium text-slate-700">Due date</span>
+              <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">Due date</span>
               <input
                 type="date"
                 value={form.dueDate}
                 onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
-                className="w-full rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-sm outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100"
+                className="w-full rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm dark:text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               />
             </label>
           </div>
           {error ? (
-            <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>
+            <p className="rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-4 py-3 text-sm font-medium text-rose-700 dark:text-rose-400">
+              {error}
+            </p>
           ) : null}
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
             <div>
               {onDelete && canDelete ? (
                 <button
                   type="button"
                   onClick={onDelete}
                   disabled={loading}
-                  className="rounded-2xl bg-rose-50 px-5 py-3 text-sm font-medium text-rose-700 disabled:opacity-50"
+                  className="rounded-2xl bg-rose-50 dark:bg-rose-900/20 px-6 py-3.5 text-sm font-bold text-rose-700 dark:text-rose-400 transition hover:bg-rose-100 dark:hover:bg-rose-900/40 disabled:opacity-50 active:scale-95"
                 >
                   Delete
                 </button>
@@ -208,9 +188,16 @@ export function ActionItemFormModal({
             <button
               type="submit"
               disabled={loading}
-              className="rounded-2xl bg-slate-950 px-5 py-3 text-sm font-medium text-white disabled:bg-slate-400"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-slate-950 dark:bg-brand-600 px-8 py-3.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 disabled:bg-slate-400 dark:disabled:bg-slate-800 active:scale-95"
             >
-              {loading ? "Saving..." : "Save action item"}
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save action item"
+              )}
             </button>
           </div>
         </form>
