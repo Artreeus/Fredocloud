@@ -1,0 +1,51 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+export function Loader({ fullPage = false, size = "md" }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const sizeClasses = {
+    sm: "h-6 w-6",
+    md: "h-10 w-10",
+    lg: "h-16 w-16",
+    xl: "h-24 w-24",
+  };
+
+  const loaderContent = (
+    <div className="flex flex-col items-center justify-center gap-4">
+      <div className={`relative ${sizeClasses[size] || sizeClasses.md}`}>
+        {/* Outer ring */}
+        <div className="absolute inset-0 rounded-full border-4 border-slate-100 dark:border-slate-800" />
+        {/* Spinning gradient ring */}
+        <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-brand-500 border-r-brand-400" />
+        
+        {/* Inner floating dot/logo element */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-1/3 w-1/3 animate-pulse rounded-full bg-slate-900 dark:bg-white shadow-glow" />
+        </div>
+      </div>
+      {fullPage && (
+        <p className="animate-pulse font-display text-sm font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+          Loading workspace...
+        </p>
+      )}
+    </div>
+  );
+
+  if (fullPage) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-canvas/80 dark:bg-slate-950/80 backdrop-blur-xl">
+        {loaderContent}
+      </div>
+    );
+  }
+
+  return loaderContent;
+}
