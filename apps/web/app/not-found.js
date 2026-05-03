@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function NotFound() {
   return (
@@ -6,6 +7,15 @@ export default function NotFound() {
       {/* Background gradients aligned with the brand schema */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,rgba(201,111,74,0.15),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(88,113,93,0.12),transparent_35%)] dark:opacity-40 animate-pulse-slow" />
       
+      {/* Top Navigation for 404 */}
+      <div className="absolute top-0 left-0 right-0 z-50 flex w-full items-center justify-between p-6 sm:p-8">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-950 dark:bg-brand-500 font-display font-bold text-white shadow-sm">F</span>
+          <span className="font-display text-xl font-bold tracking-tight text-slate-950 dark:text-white">FredoCloud</span>
+        </Link>
+        <ThemeToggle />
+      </div>
+
       <div className="relative z-10 flex w-full max-w-xl flex-col items-center text-center">
         {/* Large stylized 404 text */}
         <div className="relative mb-8">
@@ -36,12 +46,6 @@ export default function NotFound() {
           >
             Sign In
           </Link>
-        </div>
-
-        {/* Decorative element */}
-        <div className="mt-20 flex items-center gap-2">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 dark:bg-brand-500 font-display font-bold text-white shadow-sm">F</span>
-          <span className="font-display text-xl font-bold tracking-tight text-slate-950 dark:text-white">FredoCloud Hub</span>
         </div>
       </div>
 

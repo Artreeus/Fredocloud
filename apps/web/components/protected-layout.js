@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Loader } from "@/components/ui/loader";
 import { TopNav } from "@/components/top-nav";
 import { WorkspaceRealtimeBridge } from "@/components/workspace-realtime-bridge";
 import { useAuthStore } from "@/stores/auth-store";
@@ -40,10 +41,13 @@ export function ProtectedLayout({ children }) {
 
   if (!hydrated || loading || !user || !workspaceInitialized || workspaceLoading) {
     return (
-      <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(88,113,93,0.14),transparent_24%)]" />
-        <div className="relative rounded-[2rem] border border-white/60 bg-white/75 px-8 py-6 text-sm text-slate-700 shadow-float backdrop-blur">
-          Loading your workspace...
+      <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 bg-canvas dark:bg-slate-950 transition-colors duration-300">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(201,111,74,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(88,113,93,0.14),transparent_24%)] dark:opacity-40" />
+        <div className="relative flex flex-col items-center gap-6 rounded-[2.5rem] border border-white/60 dark:border-slate-800/60 bg-white/70 dark:bg-slate-900/70 p-12 shadow-float backdrop-blur-2xl animate-fade-in">
+          <Loader size="lg" />
+          <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400 animate-pulse">
+            Loading your workspace...
+          </p>
         </div>
       </main>
     );
