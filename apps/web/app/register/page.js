@@ -199,6 +199,25 @@ export default function RegisterPage() {
               )}
             </button>
           </div>
+          {form.confirmPassword && (
+            <div className="pt-1 flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider animate-in fade-in slide-in-from-top-1 duration-300">
+              {form.password === form.confirmPassword ? (
+                <>
+                  <svg className="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-emerald-500">Passwords match</span>
+                </>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  <span className="text-rose-500">Passwords do not match</span>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {localError || storeError ? (
