@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Loader2 } from "lucide-react";
 import { RichTextEditor } from "@/components/rich-text-editor";
 
@@ -14,6 +15,9 @@ export function AnnouncementFormModal({
   initialValues,
   modalTitle = "Create announcement"
 }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const [announcementTitle, setAnnouncementTitle] = useState("");
   const [body, setBody] = useState("");
   const [error, setError] = useState("");
@@ -52,9 +56,12 @@ export function AnnouncementFormModal({
     await onSubmit({ title: announcementTitle, body });
   }
 
-  return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/60 px-6 py-10 backdrop-blur-sm">
-      <div className="w-full max-w-3xl rounded-[2.2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-2xl animate-in zoom-in duration-300">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] overflow-y-auto">
+      <div className="flex min-h-full items-center justify-center p-4 sm:p-6 backdrop-blur-sm bg-slate-950/60">
+        <div className="w-full max-w-3xl rounded-[2.2rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-8 shadow-2xl animate-in zoom-in duration-300 my-auto">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-500">
@@ -126,5 +133,7 @@ export function AnnouncementFormModal({
         </form>
       </div>
     </div>
+    </div>,
+    document.body
   );
 }
