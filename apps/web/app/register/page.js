@@ -18,6 +18,8 @@ export default function RegisterPage() {
     confirmPassword: ""
   });
   const [localError, setLocalError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -53,11 +55,11 @@ export default function RegisterPage() {
   return (
     <AuthFormShell
       title="Create your workspace"
-      subtitle="Create an account, spin up a workspace, and invite your team into a more structured collaboration flow."
+      subtitle="Join FredoCloud and start collaborating with your team in a more structured flow."
       footer={
         <>
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-brand-700">
+          <Link href="/login" className="font-semibold text-brand-700 transition hover:text-brand-800">
             Sign in instead
           </Link>
         </>
@@ -65,61 +67,119 @@ export default function RegisterPage() {
       eyebrow="New Team Setup"
     >
       <form className="space-y-5" onSubmit={handleSubmit}>
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">Full name</span>
+        <div className="space-y-2">
+          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="name">
+            Full Name
+          </label>
           <input
+            id="name"
             type="text"
             value={form.name}
             onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-            className="w-full rounded-[1.4rem] border border-slate-200/90 bg-white/92 px-4 py-3 text-sm outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
             placeholder="Jane Doe"
           />
-        </label>
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">Email</span>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="email">
+            Workspace Email
+          </label>
           <input
+            id="email"
             type="email"
             value={form.email}
             onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-            className="w-full rounded-[1.4rem] border border-slate-200/90 bg-white/92 px-4 py-3 text-sm outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
             placeholder="jane@fredocloud.com"
           />
-        </label>
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">Password</span>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, password: event.target.value }))
-            }
-            className="w-full rounded-[1.4rem] border border-slate-200/90 bg-white/92 px-4 py-3 text-sm outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
-            placeholder="At least 8 characters"
-          />
-        </label>
-        <label className="block">
-          <span className="mb-2 block text-sm font-medium text-slate-700">Confirm password</span>
-          <input
-            type="password"
-            value={form.confirmPassword}
-            onChange={(event) =>
-              setForm((current) => ({ ...current, confirmPassword: event.target.value }))
-            }
-            className="w-full rounded-[1.4rem] border border-slate-200/90 bg-white/92 px-4 py-3 text-sm outline-none transition focus:border-brand-300 focus:ring-4 focus:ring-brand-100"
-            placeholder="Repeat your password"
-          />
-        </label>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="password">
+            Password
+          </label>
+          <div className="relative flex items-center">
+            <input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              value={form.password}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, password: event.target.value }))
+              }
+              className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 pr-12 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+              placeholder="At least 8 characters"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+            >
+              {showPassword ? (
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 5c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold tracking-wide text-slate-700" htmlFor="confirmPassword">
+            Confirm Password
+          </label>
+          <div className="relative flex items-center">
+            <input
+              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={form.confirmPassword}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, confirmPassword: event.target.value }))
+              }
+              className="w-full rounded-2xl border border-slate-200 bg-white px-5 py-3.5 pr-12 text-sm outline-none transition-all placeholder:text-slate-400 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10"
+              placeholder="Repeat password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-4 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-50 hover:text-slate-600"
+            >
+              {showConfirmPassword ? (
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 5c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                </svg>
+              ) : (
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+
         {localError || storeError ? (
-          <p className="rounded-[1.4rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            {localError || storeError}
-          </p>
+          <div className="flex items-center gap-3 rounded-2xl border border-rose-100 bg-rose-50 px-5 py-3.5 text-sm text-rose-700 animate-fade-in">
+            <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-medium">{localError || storeError}</span>
+          </div>
         ) : null}
+
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-[1.4rem] bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+          className="group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-slate-950 px-6 py-4 text-sm font-bold text-white transition-all hover:bg-slate-900 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-slate-300"
         >
-          {loading ? "Creating account..." : "Create account"}
+          <span className="relative z-10">{loading ? "Creating account..." : "Create Account"}</span>
         </button>
       </form>
     </AuthFormShell>
