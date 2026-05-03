@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { hasPermission } from "@/lib/permissions";
 import { AnnouncementFormModal } from "@/components/announcement-form-modal";
 import { ProtectedLayout } from "@/components/protected-layout";
@@ -12,6 +13,7 @@ import { useWorkspaceStore } from "@/stores/workspace-store";
 import { Loader } from "@/components/ui/loader";
 
 export default function AnnouncementsPage() {
+  const router = useRouter();
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const announcements = useAnnouncementStore((state) => state.announcements);
   const loading = useAnnouncementStore((state) => state.loading);
@@ -87,6 +89,10 @@ export default function AnnouncementsPage() {
     await toggleReaction(announcementId, type);
   }
 
+  function openAnnouncement(announcementId) {
+    router.push(`/announcements/${announcementId}`);
+  }
+
   return (
     <ProtectedLayout>
       <section className="space-y-6">
@@ -125,7 +131,16 @@ export default function AnnouncementsPage() {
             {announcements.map((announcement) => (
               <article
                 key={announcement.id}
-                className="rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm transition-all hover:shadow-md"
+                role="link"
+                tabIndex={0}
+                onClick={() => openAnnouncement(announcement.id)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openAnnouncement(announcement.id);
+                  }
+                }}
+                className="cursor-pointer rounded-[2.1rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-100 dark:focus:ring-brand-900/20"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
@@ -148,7 +163,10 @@ export default function AnnouncementsPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => handleTogglePin(announcement)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleTogglePin(announcement);
+                        }}
                         className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
                       >
                         {announcement.pinned ? "Unpin" : "Pin"}
@@ -156,7 +174,10 @@ export default function AnnouncementsPage() {
                       {canCreate ? (
                         <button
                           type="button"
-                          onClick={() => setEditingAnnouncement(announcement)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setEditingAnnouncement(announcement);
+                          }}
                           className="rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
                         >
                           Edit
@@ -179,6 +200,7 @@ export default function AnnouncementsPage() {
                     />
                   <Link
                     href={`/announcements/${announcement.id}`}
+                    onClick={(event) => event.stopPropagation()}
                     className="text-sm font-semibold text-slate-600 dark:text-slate-400 transition hover:text-brand-600"
                   >
                     {announcement.commentCount} comments
