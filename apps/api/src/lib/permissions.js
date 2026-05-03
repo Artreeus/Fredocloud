@@ -36,13 +36,14 @@ function getPermissionsForRole(rolePermissions, role) {
 async function syncWorkspaceRolePermissions(db, workspaceId) {
   const createPayload = [];
 
-  Object.entries(defaultRolePermissions).forEach(([role, permissions]) => {
-    permissions.forEach((permission) => {
+  Object.values(WorkspaceRole).forEach((role) => {
+    allPermissions.forEach((permission) => {
+      const isDefault = defaultRolePermissions[role]?.includes(permission);
       createPayload.push({
         workspaceId,
         role,
         permission,
-        enabled: true
+        enabled: isDefault || false
       });
     });
   });

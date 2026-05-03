@@ -121,7 +121,7 @@ export default function WorkspaceSettingsPage() {
 
   return (
     <ProtectedLayout>
-      {loading && members.length === 0 && (
+      {loading && (
         <Loader modal size="xl" />
       )}
       
