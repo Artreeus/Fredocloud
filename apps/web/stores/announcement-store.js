@@ -207,7 +207,11 @@ export const useAnnouncementStore = create((set, get) => ({
       )
     })),
   fetchAnnouncements: async ({ workspaceId, page = 1, pageSize = 10 }) => {
-    set({ loading: true, error: null });
+    if (get().announcements.length > 0 && get().announcements[0].workspaceId !== workspaceId) {
+      set({ announcements: [], pagination: null, loading: true, error: null });
+    } else {
+      set({ loading: true, error: null });
+    }
 
     try {
       const payload = await apiRequest(

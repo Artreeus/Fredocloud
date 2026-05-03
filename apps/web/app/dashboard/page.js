@@ -52,6 +52,7 @@ export default function DashboardPage() {
       return;
     }
 
+    setAnalytics(null);
     setAnalyticsLoading(true);
     apiRequest(`/api/analytics/summary?workspaceId=${activeWorkspace.id}`)
       .then((payload) => setAnalytics(payload))

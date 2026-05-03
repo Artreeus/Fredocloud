@@ -59,7 +59,11 @@ export const useActionItemStore = create((set, get) => ({
     })),
   clearSelection: () => set({ selectedIds: [] }),
   fetchActionItems: async (workspaceId) => {
-    set({ loading: true, error: null });
+    if (get().actionItems.length > 0 && get().actionItems[0].workspaceId !== workspaceId) {
+      set({ actionItems: [], selectedIds: [], loading: true, error: null });
+    } else {
+      set({ loading: true, error: null });
+    }
 
     try {
       const query = buildQuery({
