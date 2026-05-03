@@ -316,7 +316,12 @@ export default function WorkspaceSettingsPage() {
                     return (
                       <div key={member.id} className="flex items-center justify-between gap-4 rounded-2xl border border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-white/[0.02] p-4 transition hover:bg-slate-100 dark:hover:bg-white/[0.04]">
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{member.name}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{member.name}</p>
+                            {member.online && (
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" title="Online" />
+                            )}
+                          </div>
                           <p className="text-[10px] text-slate-500 truncate uppercase tracking-wider font-bold mt-0.5">{member.email}</p>
                         </div>
                         <div className="flex items-center gap-3">
