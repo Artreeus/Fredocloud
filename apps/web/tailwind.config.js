@@ -38,7 +38,28 @@ module.exports = {
       },
       boxShadow: {
         soft: "0 25px 60px -28px rgba(16, 33, 43, 0.32)",
-        float: "0 30px 80px -34px rgba(16, 33, 43, 0.28)"
+        float: "0 30px 80px -34px rgba(16, 33, 43, 0.28)",
+        glow: "0 0 20px -5px rgba(188, 95, 63, 0.4)"
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.7s ease-out',
+        'slide-up': 'slideUp 0.5s ease-out forwards',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'floating 3s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        floating: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        }
       }
     }
   },
