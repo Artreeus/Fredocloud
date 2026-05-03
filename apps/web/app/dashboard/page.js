@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { apiRequest } from "@/lib/api-client";
 import { ProtectedLayout } from "@/components/protected-layout";
+import { Loader } from "@/components/ui/loader";
 import { useToastStore } from "@/stores/toast-store";
 import { useWorkspaceStore } from "@/stores/workspace-store";
 
@@ -255,80 +256,88 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total goals</p>
-              <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
-                {analytics?.stats?.totalGoals ?? "--"}
-              </p>
+          {analyticsLoading && !analytics ? (
+            <div className="flex h-96 items-center justify-center">
+              <Loader size="lg" />
             </div>
-            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Completed this week</p>
-              <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
-                {analytics?.stats?.completedThisWeek ?? "--"}
-              </p>
-            </div>
-            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Overdue tasks</p>
-              <p className="mt-3 text-3xl font-semibold text-rose-600 dark:text-rose-400">
-                {analytics?.stats?.overdueCount ?? "--"}
-              </p>
-            </div>
-            <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Active members</p>
-              <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
-                {analytics?.stats?.activeMembers ?? "--"}
-                <span className="ml-2 text-sm font-medium text-slate-500">
-                  / {analytics?.stats?.totalMembers ?? "--"}
-                </span>
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-            <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-sm font-semibold text-slate-950 dark:text-white">Goal completion trend</p>
-              <p className="mt-1 text-sm text-slate-500">Completed vs total goals over recent weekly buckets.</p>
-              <div className="mt-6 h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics?.goalCompletionSeries || []}>
-                    <XAxis dataKey="label" stroke="#64748b" />
-                    <YAxis allowDecimals={false} stroke="#64748b" />
-                    <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '1rem', color: '#f8fafc' }} />
-                    <Bar dataKey="totalGoals" fill="#cbd5e1" radius={[10, 10, 0, 0]} />
-                    <Bar dataKey="completedGoals" fill="#3e73c5" radius={[10, 10, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+          ) : (
+            <>
+              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Total goals</p>
+                  <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
+                    {analytics?.stats?.totalGoals ?? "--"}
+                  </p>
+                </div>
+                <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Completed this week</p>
+                  <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
+                    {analytics?.stats?.completedThisWeek ?? "--"}
+                  </p>
+                </div>
+                <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Overdue tasks</p>
+                  <p className="mt-3 text-3xl font-semibold text-rose-600 dark:text-rose-400">
+                    {analytics?.stats?.overdueCount ?? "--"}
+                  </p>
+                </div>
+                <div className="rounded-[1.8rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Active members</p>
+                  <p className="mt-3 text-3xl font-semibold text-slate-950 dark:text-white">
+                    {analytics?.stats?.activeMembers ?? "--"}
+                    <span className="ml-2 text-sm font-medium text-slate-500">
+                      / {analytics?.stats?.totalMembers ?? "--"}
+                    </span>
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
-              <p className="text-sm font-semibold text-slate-950 dark:text-white">Priority distribution</p>
-              <p className="mt-1 text-sm text-slate-500">How current action items are spread across priorities.</p>
-              <div className="mt-6 h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={analytics?.priorityDistribution || []}
-                      dataKey="value"
-                      nameKey="name"
-                      innerRadius={65}
-                      outerRadius={105}
-                      paddingAngle={4}
-                    >
-                      {(analytics?.priorityDistribution || []).map((entry, index) => (
-                        <Cell
-                          key={entry.name}
-                          fill={["#10212b", "#c96f4a", "#58715d", "#863b29", "#1e293b"][index % 5]}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '1rem', color: '#f8fafc' }} />
-                  </PieChart>
-                </ResponsiveContainer>
+              <div className="mt-8 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+                <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-sm font-semibold text-slate-950 dark:text-white">Goal completion trend</p>
+                  <p className="mt-1 text-sm text-slate-500">Completed vs total goals over recent weekly buckets.</p>
+                  <div className="mt-6 h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={analytics?.goalCompletionSeries || []}>
+                        <XAxis dataKey="label" stroke="#64748b" />
+                        <YAxis allowDecimals={false} stroke="#64748b" />
+                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '1rem', color: '#f8fafc' }} />
+                        <Bar dataKey="totalGoals" fill="#cbd5e1" radius={[10, 10, 0, 0]} />
+                        <Bar dataKey="completedGoals" fill="#3e73c5" radius={[10, 10, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-5">
+                  <p className="text-sm font-semibold text-slate-950 dark:text-white">Priority distribution</p>
+                  <p className="mt-1 text-sm text-slate-500">How current action items are spread across priorities.</p>
+                  <div className="mt-6 h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={analytics?.priorityDistribution || []}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={65}
+                          outerRadius={105}
+                          paddingAngle={4}
+                        >
+                          {(analytics?.priorityDistribution || []).map((entry, index) => (
+                            <Cell
+                              key={entry.name}
+                              fill={["#10212b", "#c96f4a", "#58715d", "#863b29", "#1e293b"][index % 5]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '1rem', color: '#f8fafc' }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </article>
       </section>
     </ProtectedLayout>
