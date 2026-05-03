@@ -509,7 +509,7 @@ export default function ActionItemsPage() {
               </div>
             ) : null}
           </section>
-        }
+        )}
       </section>
 
       <ActionItemFormModal
