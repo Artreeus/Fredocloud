@@ -16,7 +16,6 @@ export function ProtectedLayout({ children }) {
   const fetchMe = useAuthStore((state) => state.fetchMe);
   const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
   const workspaceInitialized = useWorkspaceStore((state) => state.initialized);
-  const workspaceLoading = useWorkspaceStore((state) => state.loading);
   const bootstrap = useWorkspaceStore((state) => state.bootstrap);
   const resetWorkspaceStore = useWorkspaceStore((state) => state.reset);
 
