@@ -13,7 +13,7 @@ const { workspaceRouter } = require("./routes/workspace.routes");
 const { env } = require("./config/env");
 const { buildOpenApiSpec } = require("./docs/openapi");
 const { pusher } = require("./lib/pusher");
-const { authMiddleware } = require("./middleware/auth.middleware");
+const { requireAuth } = require("./middleware/auth.middleware");
 const { prisma } = require("./lib/prisma");
 
 const app = express();
@@ -70,7 +70,7 @@ app.use("/api/notifications", notificationRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/workspaces", workspaceRouter);
 
-app.post("/api/pusher/auth", authMiddleware, async (req, res, next) => {
+app.post("/api/pusher/auth", requireAuth, async (req, res, next) => {
   try {
     const { socket_id, channel_name } = req.body;
     const workspaceId = channel_name.replace(/^(private|presence)-workspace-/, "");
