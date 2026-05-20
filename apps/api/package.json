@@ -22,8 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "prisma": "^6.8.2",
-    "pusher": "^5.2.0",
-    "swagger-ui-express": "^5.0.1"
+    "pusher": "^5.2.0"
   },
   "devDependencies": {
     "eslint": "^8.57.1",

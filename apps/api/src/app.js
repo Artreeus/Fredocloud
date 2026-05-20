@@ -1,7 +1,6 @@
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const express = require("express");
-const swaggerUi = require("swagger-ui-express");
 const { actionItemRouter } = require("./routes/action-item.routes");
 const { analyticsRouter } = require("./routes/analytics.routes");
 const { announcementRouter } = require("./routes/announcement.routes");
@@ -52,14 +51,35 @@ app.get("/api/openapi.json", (req, res) => {
   res.status(200).json(openApiSpec);
 });
 
-app.use(
-  "/api/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(openApiSpec, {
-    explorer: true,
-    customSiteTitle: "FredoCloud API Docs"
-  })
-);
+app.get("/api/docs", (req, res) => {
+  const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <title>FredoCloud API Docs</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script>
+      window.onload = function() {
+        SwaggerUIBundle({
+          url: "/api/openapi.json",
+          dom_id: "#swagger-ui",
+          presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+          layout: "StandaloneLayout",
+          tryItOutEnabled: true
+        });
+      };
+    </script>
+  </body>
+</html>`;
+  res.setHeader("Content-Type", "text/html");
+  res.send(html);
+});
 
 app.use("/api/action-items", actionItemRouter);
 app.use("/api/analytics", analyticsRouter);
