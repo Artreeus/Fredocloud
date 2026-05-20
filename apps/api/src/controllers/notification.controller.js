@@ -1,5 +1,5 @@
 const { prisma } = require("../lib/prisma");
-const { emitWorkspaceEvent } = require("../lib/socket");
+const { triggerWorkspaceEvent } = require("../lib/pusher");
 
 async function listNotifications(req, res, next) {
   try {
@@ -63,7 +63,7 @@ async function createNotificationAndEmit(data) {
   });
 
   if (notification.workspaceId) {
-    emitWorkspaceEvent(notification.workspaceId, "notification:new", {
+    triggerWorkspaceEvent(notification.workspaceId, "notification:new", {
       notification
     });
   }
