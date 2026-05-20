@@ -3,8 +3,9 @@
   "private": true,
   "scripts": {
     "dev": "nodemon src/index.js",
-    "build": "node -e \"require('fs').mkdirSync('dist',{ recursive: true }); console.log('API build step placeholder ready')\"",
+    "build": "prisma generate",
     "start": "node src/index.js",
+    "postinstall": "prisma generate",
     "lint": "eslint . --ext js",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
@@ -12,8 +13,6 @@
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
-    "@repo/types": "workspace:*",
-    "@repo/utils": "workspace:*",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",
@@ -22,14 +21,13 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "prisma": "^6.8.2",
     "pusher": "^5.2.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "@repo/config": "workspace:*",
     "eslint": "^8.57.1",
-    "nodemon": "^3.1.10",
-    "prisma": "^6.8.2"
+    "nodemon": "^3.1.10"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

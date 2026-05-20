@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { AuditAction, WorkspaceRole } = require("../../generated/prisma");
-const { slugify } = require("@repo/utils");
+const { slugify } = require("../lib/utils");
 const {
   buildPublicUser,
   clearAuthCookies,

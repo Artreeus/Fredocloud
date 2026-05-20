@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 const { AuditAction, InvitationStatus, NotificationType, Permission, WorkspaceRole } = require("../../generated/prisma");
-const { slugify } = require("@repo/utils");
+const { slugify } = require("../lib/utils");
 const { prisma } = require("../lib/prisma");
 const { sendWorkspaceInviteEmail } = require("../lib/email");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
