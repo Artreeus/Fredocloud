@@ -3,7 +3,7 @@ const { assertWorkspacePermission } = require("../lib/permissions");
 const { sendMentionEmail } = require("../lib/email");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
-const { emitWorkspaceEvent } = require("../lib/socket");
+const { triggerWorkspaceEvent } = require("../lib/pusher");
 const { createNotificationAndEmit } = require("./notification.controller");
 
 const reactionLabels = {
@@ -181,7 +181,7 @@ async function createAnnouncement(req, res, next) {
 
     const serializedAnnouncement = serializeAnnouncement(announcement, req.user.id);
 
-    emitWorkspaceEvent(workspaceId, "announcement:new", {
+    triggerWorkspaceEvent(workspaceId, "announcement:new", {
       announcement: serializedAnnouncement
     });
 
@@ -376,7 +376,7 @@ async function toggleReaction(req, res, next) {
 
     const serializedAnnouncement = serializeAnnouncement(refreshed, req.user.id);
 
-    emitWorkspaceEvent(announcement.workspaceId, "reaction:update", {
+    triggerWorkspaceEvent(announcement.workspaceId, "reaction:update", {
       announcement: serializedAnnouncement
     });
 
@@ -486,7 +486,7 @@ async function createComment(req, res, next) {
       replies: []
     };
 
-    emitWorkspaceEvent(announcement.workspaceId, "comment:new", {
+    triggerWorkspaceEvent(announcement.workspaceId, "comment:new", {
       announcementId: announcement.id,
       comment: serializedComment,
       parentCommentId: parentCommentId || null
@@ -555,7 +555,7 @@ async function updateComment(req, res, next) {
       replies: []
     };
 
-    emitWorkspaceEvent(announcement.workspaceId, "comment:update", {
+    triggerWorkspaceEvent(announcement.workspaceId, "comment:update", {
       announcementId: announcement.id,
       comment: serializedComment
     });
@@ -621,7 +621,7 @@ async function deleteComment(req, res, next) {
       where: { id: comment.id }
     });
 
-    emitWorkspaceEvent(announcement.workspaceId, "comment:delete", {
+    triggerWorkspaceEvent(announcement.workspaceId, "comment:delete", {
       announcementId: announcement.id,
       commentId: comment.id
     });
