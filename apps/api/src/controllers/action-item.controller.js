@@ -1,7 +1,7 @@
 const { ActionItemStatus, AuditAction, NotificationType, Permission } = require("../../generated/prisma");
 const { assertWorkspacePermission } = require("../lib/permissions");
 const { prisma } = require("../lib/prisma");
-const { emitWorkspaceEvent } = require("../lib/socket");
+const { triggerWorkspaceEvent } = require("../lib/pusher");
 const { createError, getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { createNotificationAndEmit } = require("./notification.controller");
 
@@ -255,7 +255,7 @@ async function createActionItem(req, res, next) {
 
     const serializedActionItem = serializeActionItem(actionItem);
 
-    emitWorkspaceEvent(workspaceId, "action-item:update", {
+    triggerWorkspaceEvent(workspaceId, "action-item:update", {
       actionItem: serializedActionItem
     });
 
@@ -316,7 +316,7 @@ async function updateActionItem(req, res, next) {
 
     const serializedActionItem = serializeActionItem(actionItem);
 
-    emitWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
+    triggerWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
       actionItem: serializedActionItem
     });
 
@@ -364,7 +364,7 @@ async function updateActionItemStatus(req, res, next) {
 
     const serializedActionItem = serializeActionItem(actionItem);
 
-    emitWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
+    triggerWorkspaceEvent(existingActionItem.workspaceId, "action-item:update", {
       actionItem: serializedActionItem
     });
 
