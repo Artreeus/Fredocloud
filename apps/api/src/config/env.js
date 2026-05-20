@@ -20,7 +20,11 @@ const env = {
   emailJsPrivateKey: process.env.EMAILJS_PRIVATE_KEY || "",
   emailJsInviteTemplateId: process.env.EMAILJS_INVITE_TEMPLATE_ID || "",
   emailJsMentionTemplateId: process.env.EMAILJS_MENTION_TEMPLATE_ID || "",
-  appName: process.env.APP_NAME || "FredoCloud"
+  appName: process.env.APP_NAME || "FredoCloud",
+  pusherAppId: process.env.PUSHER_APP_ID || "",
+  pusherKey: process.env.PUSHER_KEY || "",
+  pusherSecret: process.env.PUSHER_SECRET || "",
+  pusherCluster: process.env.PUSHER_CLUSTER || "mt1"
 };
 
 module.exports = { env };
