@@ -1,5 +1,4 @@
 const { ActionItemStatus, GoalStatus, Priority } = require("../../generated/prisma");
-const { getActiveUserIds } = require("../lib/socket");
 const { getWorkspaceMembershipOrThrow } = require("../lib/workspaces");
 const { prisma } = require("../lib/prisma");
 
@@ -65,7 +64,7 @@ async function getAnalyticsSummary(req, res, next) {
     const overdueCount = actionItems.filter(
       (item) => item.dueDate && item.status !== ActionItemStatus.DONE && new Date(item.dueDate) < new Date()
     ).length;
-    const activeMembers = getActiveUserIds(workspaceId).length;
+    const activeMembers = 0;
 
     const goalCompletionSeries = Array.from({ length: 6 }, (_, index) => {
       const bucketDate = startOfWeek(new Date());
