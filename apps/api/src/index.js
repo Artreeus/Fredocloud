@@ -1,12 +1,10 @@
-const http = require("http");
-const { env } = require("./config/env");
 const { app } = require("./app");
-const { initSocketServer } = require("./lib/socket");
+const { env } = require("./config/env");
 
-const server = http.createServer(app);
+if (require.main === module) {
+  app.listen(env.port, () => {
+    console.log(`API server listening on http://localhost:${env.port}`);
+  });
+}
 
-initSocketServer(server);
-
-server.listen(env.port, () => {
-  console.log(`API server listening on http://localhost:${env.port}`);
-});
+module.exports = app;
