@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { disconnectWorkspaceSocket, getWorkspaceSocket } from "@/lib/socket-client";
+import { disconnectWorkspaceChannels, getWorkspaceChannels } from "@/lib/pusher-client";
 import { useActionItemStore } from "@/stores/action-item-store";
 import { useAnnouncementStore } from "@/stores/announcement-store";
 import { useAuthStore } from "@/stores/auth-store";
@@ -24,7 +24,8 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
       return undefined;
     }
 
-    const socket = getWorkspaceSocket(workspaceId);
+    const channelGroup = getWorkspaceChannels(workspaceId);
+    const { private: privateChannel, presence: presenceChannel } = channelGroup;
 
     function handleAnnouncementEvent(payload) {
       if (payload?.announcement) {
@@ -62,45 +63,41 @@ export function WorkspaceRealtimeBridge({ workspaceId }) {
       }
     }
 
-    function handlePresenceSync(payload) {
-      setPresenceSnapshot(payload?.userIds || []);
+    function handlePresenceSync(data) {
+      setPresenceSnapshot(Object.keys(data.members));
     }
 
-    function handleUserOnline(payload) {
-      if (payload?.userId) {
-        setMemberPresence(payload.userId, true);
-      }
+    function handleMemberAdded(member) {
+      setMemberPresence(member.id, true);
     }
 
-    function handleUserOffline(payload) {
-      if (payload?.userId) {
-        setMemberPresence(payload.userId, false);
-      }
+    function handleMemberRemoved(member) {
+      setMemberPresence(member.id, false);
     }
 
-    socket.on("announcement:new", handleAnnouncementEvent);
-    socket.on("reaction:update", handleAnnouncementEvent);
-    socket.on("comment:new", handleCommentEvent);
-    socket.on("comment:update", handleCommentUpdateEvent);
-    socket.on("comment:delete", handleCommentDeleteEvent);
-    socket.on("action-item:update", handleActionItemEvent);
-    socket.on("notification:new", handleNotificationEvent);
-    socket.on("presence:sync", handlePresenceSync);
-    socket.on("user:online", handleUserOnline);
-    socket.on("user:offline", handleUserOffline);
+    privateChannel.bind("announcement:new", handleAnnouncementEvent);
+    privateChannel.bind("reaction:update", handleAnnouncementEvent);
+    privateChannel.bind("comment:new", handleCommentEvent);
+    privateChannel.bind("comment:update", handleCommentUpdateEvent);
+    privateChannel.bind("comment:delete", handleCommentDeleteEvent);
+    privateChannel.bind("action-item:update", handleActionItemEvent);
+    privateChannel.bind("notification:new", handleNotificationEvent);
+    presenceChannel.bind("pusher:subscription_succeeded", handlePresenceSync);
+    presenceChannel.bind("pusher:member_added", handleMemberAdded);
+    presenceChannel.bind("pusher:member_removed", handleMemberRemoved);
 
     return () => {
-      socket.off("announcement:new", handleAnnouncementEvent);
-      socket.off("reaction:update", handleAnnouncementEvent);
-      socket.off("comment:new", handleCommentEvent);
-      socket.off("comment:update", handleCommentUpdateEvent);
-      socket.off("comment:delete", handleCommentDeleteEvent);
-      socket.off("action-item:update", handleActionItemEvent);
-      socket.off("notification:new", handleNotificationEvent);
-      socket.off("presence:sync", handlePresenceSync);
-      socket.off("user:online", handleUserOnline);
-      socket.off("user:offline", handleUserOffline);
-      disconnectWorkspaceSocket(workspaceId);
+      privateChannel.unbind("announcement:new", handleAnnouncementEvent);
+      privateChannel.unbind("reaction:update", handleAnnouncementEvent);
+      privateChannel.unbind("comment:new", handleCommentEvent);
+      privateChannel.unbind("comment:update", handleCommentUpdateEvent);
+      privateChannel.unbind("comment:delete", handleCommentDeleteEvent);
+      privateChannel.unbind("action-item:update", handleActionItemEvent);
+      privateChannel.unbind("notification:new", handleNotificationEvent);
+      presenceChannel.unbind("pusher:subscription_succeeded", handlePresenceSync);
+      presenceChannel.unbind("pusher:member_added", handleMemberAdded);
+      presenceChannel.unbind("pusher:member_removed", handleMemberRemoved);
+      disconnectWorkspaceChannels(workspaceId);
     };
   }, [
     applySocketActionItem,
