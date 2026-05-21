@@ -122,6 +122,8 @@ Documented API areas include:
 
 ## Local Development
 
+The setup below assumes `pnpm` is installed and PostgreSQL is reachable from the API environment.
+
 ### 1. Install dependencies
 
 ```bash
