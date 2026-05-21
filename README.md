@@ -15,6 +15,8 @@ FredoCloud is a collaborative team workspace application built in a Turborepo mo
 - Email: `demo@fredocloud.com`
 - Password: `Demo@12345`
 
+Use the demo account for reviewer walkthroughs and quick smoke tests.
+
 ## Highlights
 
 - JWT authentication with access and refresh tokens in `httpOnly` cookies
