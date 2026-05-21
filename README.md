@@ -105,6 +105,7 @@ packages/
 - Workspace summary metrics
 - Goal and action-item visualizations
 - CSV export endpoint
+- Dashboard data grouped for progress, workload, and activity review
 
 ## API Documentation
 
