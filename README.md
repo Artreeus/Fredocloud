@@ -108,6 +108,8 @@ packages/
 
 Swagger UI is available at `/api/docs`, and the raw OpenAPI document is available at `/api/openapi.json`.
 
+Use the Swagger UI to test authenticated endpoints after logging in through the web app.
+
 Documented API areas include:
 
 - Auth
