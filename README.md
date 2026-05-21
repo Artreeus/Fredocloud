@@ -73,6 +73,7 @@ packages/
 - Create, update, switch, and delete workspaces
 - Invite members and manage roles
 - Permission matrix editing for workspace roles
+- Workspace-scoped dashboards and collaboration surfaces
 
 ### Goals
 
