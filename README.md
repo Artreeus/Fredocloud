@@ -160,6 +160,8 @@ pnpm --filter api db:seed
 pnpm dev
 ```
 
+The web app runs on `http://localhost:3000` and the API runs on `http://localhost:4000` during local development.
+
 ## Environment Variables
 
 ### Backend
