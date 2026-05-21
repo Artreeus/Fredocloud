@@ -139,6 +139,8 @@ cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env.local
 ```
 
+Update the copied files with database, auth, Pusher, Cloudinary, and EmailJS values before starting the apps.
+
 ### 3. Generate Prisma client and run migrations
 
 ```bash
