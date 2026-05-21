@@ -244,6 +244,8 @@ Presence events are handled natively on `presence-workspace-{workspaceId}`:
 
 Both apps are deployed as separate Vercel projects from the same repository.
 
+Deployments should keep the web `NEXT_PUBLIC_API_URL` aligned with the active API deployment URL.
+
 | Project | Root Directory | URL |
 |---------|---------------|-----|
 | web | `apps/web` | `https://web-pi-umber-98.vercel.app` |
