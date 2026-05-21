@@ -215,6 +215,8 @@ pnpm --filter api db:migrate
 pnpm --filter api db:seed
 ```
 
+Run `pnpm build` before deployment checks to validate both workspace apps together.
+
 ## Realtime Events (via Pusher Channels)
 
 Workspace events are broadcast on `private-workspace-{workspaceId}`:
