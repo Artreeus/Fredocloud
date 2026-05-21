@@ -91,6 +91,7 @@ packages/
 - Kanban board
 - Filterable list view
 - Quick status changes and bulk updates
+- Assignment, priority, and due-date tracking for task planning
 
 ### Realtime + Notifications
 
